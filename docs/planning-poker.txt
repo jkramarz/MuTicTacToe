@@ -1,0 +1,38 @@
+id	estimate	As a/an...	I would like to ...	So that...
+596921	1.0	user in main menu	get into main menu	choose what I'm going to do
+596925	1.0	user in main menu	specify the server address	I can connect to it
+596930	1.0	user in main menu	start a new game	I would play the game
+596937	0.5	user in main menu	close the program	
+596938	3.0	user in main menu	list network games	I would choose network game to join
+596940	1.0	user choosing network game	join network game	I would play with other player
+596945	0.5	user starting new game	choose between PvP and PvC	
+596946	1.0	user starting new game	choose starting player	I would play with black or white pieces
+596948	5.0	user playing a game	have the game board displayed with 15x15 fields	I can see the game pieces
+596951	1.0	user playing a game	end the game	I'll return to main menu
+596952	0.5	user playing a PvP game	get notified about other player's disconnection	I wouldn't fall asleep waiting for his move
+596957	2.0	user playing a game	see other player's moves	
+596961	2.0	user playing a game	click on empty field	I can put my piece on the game board
+596962	2.0	user playing a game	click on occupied field	get negative feedback
+596963	1.0	user playing a game	be able to distinguish between my and oponent's tokens	
+596964	1.0	user playing a game	have the game finished when 5-in-a-row	one of players will win
+596965	2.0	user playing a game	have a field with mouse over highlighted	I will have my pointer's movement feedback
+596966	2.0	user playing a game	have the game board locked during the opponent's turn	I can't put too many pieces
+596967	8.0	user playing PvC game	have my oponent competetive	my play will be satisfying
+596968	5.0	game server developer	have game tree generator	artificial intelligence would be able to use it
+596971	2.0	artificial intelligence	receive oponent's movements	
+596972	1.0	artificial intelligence	have current game state	choose current vertex in game tree
+596973	1.0	artificial intelligence	be able to respond to oponent's movement	
+596974	8.0	artificial intelligence	be heuresticly optimized to respond in less than 1 second	the gameplay is smooth
+596975	3.0	artificial intelligence	end the game when 5-in-the-row	end the thread
+596976	1.0	game server	run as Linux daemon	
+596977	5.0	game server	run in multiple threads mode	
+596978	2.0	game server running in multiple threads mode	log to file	provide usage informations and connections list
+596979	3.0	game server	run in single thread mode	
+596980	1.0	game server running in single thread mode	verbosely log to std:err	provide developer with debug output
+596981	3.0	game server	spawn artificial intelligence thread	
+596982	5.0	game server	interconnect oponents	
+596983	3.0	game server	notify oponents about connection and disconnection	the game will go on!
+596984	3.0	game server	list network games	respond to request
+596985	5.0	game server	listen on port & wait for connections	players could play a game
+596986	2.0	game server	handle signals	notify players before closing daemon
+596987	2.0	user who finished a game	see the result of the game	
