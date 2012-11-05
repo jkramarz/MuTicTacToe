@@ -2,7 +2,7 @@ id	estimate	As a/an...	I would like to ...	So that...
 
 Sprint 1.
 596963	1.0	user playing a game	be able to distinguish between my and oponent's tokens	
-596948	3.0	user playing a game	have the game board displayed with 15x15 fields	I can see the game pieces
+596948	3.0	user playing a game	have the game board displayed with 10x10 fields	I can see the game pieces
 596957	2.0	user playing a game	see other player's moves	
 596979	3.0	game server	run in single thread mode	
 596980	1.0	game server running in single thread mode	verbosely log to std:err	provide developer with debug output
