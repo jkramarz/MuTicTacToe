@@ -1,0 +1,33 @@
+1. Połączenie z serwerem
+* Domyślnym portem serwera jest port 10001.
+* W połączeniu używany jest protokół TCP.
+* Kolejne komunikaty oddzielane są znakiem nowej linii
+* Używanym kodowaniem jest UTF-8
+* Wielkość znaków nie ma znaczenia
+ 
+2. Rozpoczęcie nowej gry z innym graczem
+* Klient wysyła do serwera pojedynczy komunikat JSON {"action": "NEW GAME", "type": "PVP"} , otrzymując w odpowiedzi {"status": "OK", "port": "NUMER_PORTU"}, gdzie NUMER_PORTU jest portem na którym nasłuchuje nowa sesja gry player vs. player, bądź {"status": "ERROR", "error_code": "NUMER_BŁĘDU", "error_message": "KOMUNIKAT_BŁĘDU"}, gdzie NUMER_BŁĘDU jest numer błędu z osobnego dokumentu, a KOMUNIKAT_BŁĘDU przystępną dla człowieka jego formą.
+* Klient zamyka wcześniejsze połączenie i nawiązuje nowe, na wskazanym porcie. 
+
+3. Rozpoczęcie nowej gry z komputerem
+* Podobnie jak 2, lecz klient wysyła komunikat z atrybutem "type" ustawionym na "PVC".
+
+4. Rozpoczęcie rozgrywki
+* Pierwszemu połączonemu klientowi serwer wysyła komunikat {"status": "WHO STARTS"}, oczekując w odpowiedzi {"action": "ME"} jeżeli gracz chce rozpocząć grę lub {"status": "OPONENT"} jeżeli oczekuje że drugi z graczy rozpocznie rozgrywkę.
+
+5. Dołączenie do istniejącej gry 
+* Klient przesyła do serwera komunikat {"action": "LIST GAMES"} otrzymując w odpowiedzi {"status":"OK", "games": [{"port": "PORT GRY"}, "client": "IP ROZPOCZYNAJĄCEGO KLIENTA"}, ...] } bądź {"status": "ERROR", "error_code": "NUMER_BŁĘDU", "error_message": "KOMUNIKAT_BŁĘDU"}
+
+5. Rozgrywka
+W trakcie gry następuje wymiana następujących komunikatów między serwerem a klientem:
+* {"status":"TURN", "attribute": "YOUR|OPONENT"} - wyznacza następnego gracza mogącego wykonać ruch, odblokowuje/blokuje planszę w kliencie
+* {"status":"PLACE", "X":"x", "Y":"y"} - oznacza położenie przez przeciwnika pionka na polu x y
+* {"status":"WIN", "attribute":"YOUR|OPONENT"} - oznacza wygraną gracza lub przeciwnika w następstwie wykonanego ruchu
+* {"status":"DISCONNECT", "attribute":"OPONENT|SERVER"} - oznacza rozłączenie się drugiego gracza bądź rozpoczęcie wyłączania serwera przez operatora
+* {"status":"CHAT", "message":"MESSAGE"} - oznaczna otrzymanie od drugiego gracza wiadomości o treści MESSAGE
+
+W trakcie gry następuje wymiana następujących komunikatów między klientem a serwerem:
+* {"action":"PLACE", "X":"x", "Y":"y"} - oznacza chęć położenia przez gracza pionka na polu x y
+* {"action":"CHAT", "message":"MESSAGE"} - oznaczna wysłanie do drugiego gracza wiadomości o treści MESSAGE
+* {"action":"DISCONNECT"} - oznacza chęć rozłączenia się od serwera 
+W odpowiedzi może zosta przesłany komunikat {"status":"OK"} albo {"status": "ERROR", "error_code": "NUMER_BŁĘDU", "error_message": "KOMUNIKAT_BŁĘDU"}

@@ -1,0 +1,4 @@
+503 - brak możliwości stworzenia gry ze wzgledu na brak dostepnych wolnych portow,
+501 - dana metoda jest niezaimplementowana na serwerze,
+409 - przesłany komunikat nieadekwatny do obecnego stanu
+403 - próba położenia pionka na już zajetym miejscu

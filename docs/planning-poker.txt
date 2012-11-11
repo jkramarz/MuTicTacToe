@@ -24,9 +24,9 @@ Sprint 3.
 596951	1.0	user playing a game	end the game	I'll return to main menu
 596987	2.0	user who finished a game	see the result of the game	
 596965	2.0	user playing a game	have a field with mouse over highlighted	I will have my pointer's movement feedback
-596976	1.0	game server	run as Linux daemon	
 596977	3.0	game server	run in multiple threads mode	
 596978	2.0	game server running in multiple threads mode	log to file	provide usage informations and connections list
+000001  2.0 game server	disjoint set data structure	
 
 Sprint 4.
 596938	3.0	user in main menu	list network games	I would choose network game to join
@@ -39,6 +39,7 @@ Sprint 4.
 596975	3.0	artificial intelligence	end the game when 5-in-the-row	end the thread
 
 Sprint 5.
+596976	1.0	game server	run as Linux daemon	
 596962	2.0	user playing a game	click on occupied field	get negative feedback
 596966	2.0	user playing a game	have the game board locked during the opponent's turn	I can't put too many pieces
 596952	0.5	user playing a PvP game	get notified about other player's disconnection	I wouldn't fall asleep waiting for his move
