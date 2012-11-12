@@ -6,6 +6,7 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +72,11 @@ public class Server {
 		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(command);
 		switch(jsonObject.getString("action").toUpperCase()){
 			case "NEW GAME":
-				return newGame();
+				if(jsonObject.containsKey("name")){
+					return newGame(jsonObject.getString("name"));
+				}else{
+					return newGame(null);
+				}
 			case "LIST GAMES":
 				return listGames();
 			default:
@@ -79,11 +84,24 @@ public class Server {
 		}
 	}
 	
+	
 	private static String listGames() {
-		// TODO Auto-generated method stub
+		/*ArrayList<Map<String, String>> gamesList = new ArrayList<>();
+		for(int port : games.keySet()){
+			if(games.get(port) != null){
+				Map<String, String> game = new HashMap<>();
+				game.put("port", new Integer(port).toString());
+				game.put("name", games.get(port).getGameName());
+				gamesList.add(game);
+			}
+		}
+		Map<String, Object> message = new HashMap<>();
+		message.add("status", "OK");
+		message.add("games", gamesList);*/
+		
 		return Message.getErrorMessage(401);
 	}
-	private static String newGame() {
+	private static String newGame(String name) {
 		System.err.println("Szukanie wolnego portu");
 		for(int i = port_start; i <= port_end; i++){
 			System.err.println("Port " + i);
@@ -93,7 +111,12 @@ public class Server {
 			}
 			if(!games.containsKey(i)){
 				System.err.println(" wolny port, rozpoczynam grê");
-				Game game = new Game(i);
+				Game game;
+				if(name != null){
+					game = new Game(i, name);
+				}else{
+					game = new Game(i);
+				}
 				games.put(i, game);
 				game.start();
 			

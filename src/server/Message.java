@@ -71,4 +71,10 @@ class Message {
 		message.put("y", y.toString());
 		return JSONSerializer.toJSON(message).toString() + "\n";
 	}
+
+	public static String getConnectedMessage(){
+		Map<String, String> message = new HashMap<>();
+		message.put("status", "CONNECTED");
+		return JSONSerializer.toJSON(message).toString() + "\n";
+	}
 }

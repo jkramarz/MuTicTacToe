@@ -12,10 +12,16 @@ public class Game extends Thread{
 	private ServerSocket serversocket;
 	private ArrayList<Player> players;
 	private int turn;
+	private String gameName;
 	int[][] fields;
 	
 	@SuppressWarnings("unused")
 	private Game(){}
+	
+	public Game(int i, String n){
+		this(i);
+		gameName = n;
+	}
 	
 	public Game(int i) {
 		port = i;
@@ -27,6 +33,10 @@ public class Game extends Thread{
 		}
 	}
 
+	public String getGameName(){
+		return gameName;
+	}
+	
 	public void run(){
 		System.err.println("W¹tek Game na porcie " + port);
 		players = new ArrayList<>();
@@ -51,6 +61,9 @@ public class Game extends Thread{
 					}else{
 						turn = 1;
 					}
+				}else{
+					players.get(0).writer.write(Message.getConnectedMessage());
+					players.get(0).writer.flush();
 				}
 				players.add(player);
 			}
