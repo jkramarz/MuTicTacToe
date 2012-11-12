@@ -1,4 +1,4 @@
-1. Połączenie z serwerem
+﻿1. Połączenie z serwerem
 * Domyślnym portem serwera jest port 10001.
 * W połączeniu używany jest protokół TCP.
 * Kolejne komunikaty oddzielane są znakiem nowej linii
@@ -13,7 +13,7 @@
 * Podobnie jak 2, lecz klient wysyła komunikat z atrybutem "type" ustawionym na "PVC".
 
 4. Rozpoczęcie rozgrywki
-* Pierwszemu połączonemu klientowi serwer wysyła komunikat {"status": "WHO STARTS"}, oczekując w odpowiedzi {"action": "ME"} jeżeli gracz chce rozpocząć grę lub {"status": "OPONENT"} jeżeli oczekuje że drugi z graczy rozpocznie rozgrywkę.
+* Pierwszemu połączonemu klientowi serwer wysyła komunikat {"status": "WHO STARTS"}, oczekując w odpowiedzi {"action": "ME"} jeżeli gracz chce rozpocząć grę lub {"action": "OPONENT"} jeżeli oczekuje że drugi z graczy rozpocznie rozgrywkę.
 
 5. Dołączenie do istniejącej gry 
 * Klient przesyła do serwera komunikat {"action": "LIST GAMES"} otrzymując w odpowiedzi {"status":"OK", "games": [{"port": "PORT GRY"}, "client": "IP ROZPOCZYNAJĄCEGO KLIENTA"}, ...] } bądź {"status": "ERROR", "error_code": "NUMER_BŁĘDU", "error_message": "KOMUNIKAT_BŁĘDU"}
