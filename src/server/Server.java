@@ -84,14 +84,19 @@ public class Server {
 		return Message.getErrorMessage(401);
 	}
 	private static String newGame() {
+		System.err.println("Szukanie wolnego portu");
 		for(int i = port_start; i <= port_end; i++){
+			System.err.println("Port " + i);
 			if(games.containsKey(i) && !games.get(i).isAlive()){
+				System.err.println(" nieaktywana gra, zwalniam port");
 				games.remove(i);
 			}
 			if(!games.containsKey(i)){
+				System.err.println(" wolny port, rozpoczynam grê");
 				Game game = new Game(i);
 				games.put(i, game);
-				game.run();
+				game.start();
+			
 				return Message.getNewGameMessage(i);
 			}
 		}

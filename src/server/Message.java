@@ -10,7 +10,7 @@ class Message {
 		error.put("status", "ERROR");
 		error.put("error_code", i.toString());
 		error.put("error_message", getErrorText(i));
-		return JSONSerializer.toJSON(error).toString();
+		return JSONSerializer.toJSON(error).toString() + "\n";
 	}
 	static String getErrorText(int i) {
 		switch(i){
@@ -33,12 +33,37 @@ class Message {
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "OK");
 		message.put("port", i.toString());
-		return JSONSerializer.toJSON(message).toString();
+		return JSONSerializer.toJSON(message).toString() + "\n";
 	}
 	
 	public static String getChooseSideMessage(){
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "WHO STARTS");
-		return JSONSerializer.toJSON(message).toString();
+		return JSONSerializer.toJSON(message).toString() + "\n";
+	}
+	
+	public static String getPlayerTurnMessage() {
+		Map<String, String> message = new HashMap<>();
+		message.put("status", "TURN");
+		message.put("attibute", "YOUR");
+		return JSONSerializer.toJSON(message).toString() + "\n";
+	}
+	public static String getOponentTurnMessage() {
+		Map<String, String> message = new HashMap<>();
+		message.put("status", "TURN");
+		message.put("attibute", "OPONENT");
+		return JSONSerializer.toJSON(message).toString() + "\n";
+	}
+	public static String getDisconnectedMessage() {
+		Map<String, String> message = new HashMap<>();
+		message.put("status", "DISCONNECTED");
+		return JSONSerializer.toJSON(message).toString() + "\n";
+	}
+	public static String getOponentPlaceMessage(Integer x, Integer y){
+		Map<String, String> message = new HashMap<>();
+		message.put("status", "PLACE");
+		message.put("x", x.toString());
+		message.put("y", y.toString());
+		return JSONSerializer.toJSON(message).toString() + "\n";
 	}
 }
