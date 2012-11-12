@@ -5,6 +5,7 @@ import java.util.Map;
 import net.sf.json.JSONSerializer;
 
 class Message {
+	
 	static String getErrorMessage(Integer i) {
 		Map<String, String> error = new HashMap<>();
 		error.put("status", "ERROR");
@@ -12,6 +13,7 @@ class Message {
 		error.put("error_message", getErrorText(i));
 		return JSONSerializer.toJSON(error).toString() + "\n";
 	}
+	
 	static String getErrorText(int i) {
 		switch(i){
 			case 503:
@@ -48,17 +50,20 @@ class Message {
 		message.put("attibute", "YOUR");
 		return JSONSerializer.toJSON(message).toString() + "\n";
 	}
+	
 	public static String getOponentTurnMessage() {
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "TURN");
 		message.put("attibute", "OPONENT");
 		return JSONSerializer.toJSON(message).toString() + "\n";
 	}
+	
 	public static String getDisconnectedMessage() {
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "DISCONNECTED");
 		return JSONSerializer.toJSON(message).toString() + "\n";
 	}
+	
 	public static String getOponentPlaceMessage(Integer x, Integer y){
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "PLACE");

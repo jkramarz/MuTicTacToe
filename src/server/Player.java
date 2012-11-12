@@ -25,6 +25,7 @@ class Player {
 					)
 				);
 	}
+	
 	Boolean isConnected(){
 		return socket.isConnected();
 	}

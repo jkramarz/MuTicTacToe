@@ -12,14 +12,19 @@ public class Game extends Thread{
 	private ServerSocket serversocket;
 	private ArrayList<Player> players;
 	private int turn;
-	boolean[][] fields;
+	int[][] fields;
 	
 	@SuppressWarnings("unused")
 	private Game(){}
 	
 	public Game(int i) {
 		port = i;
-		fields = new boolean[10][10];
+		fields = new int[10][10];
+		for(int x = 0; x < 10; x++){
+			for(int y = 0; y < 10; y++){
+				fields[x][y]=-1;
+			}
+		}
 	}
 
 	public void run(){
@@ -59,9 +64,27 @@ public class Game extends Thread{
 				sendTurns();
 				end_of_game = !game();
 				turn = getOponentIndex();
-			}while(!end_of_game && players.get(0).isConnected() && players.get(1).isConnected());
+			}while(
+					!end_of_game &&
+					players.get(0).isConnected() && 
+					players.get(1).isConnected()
+				  );
 		}catch (Exception e) {
-			// TODO Auto-generated catch block
+			for(int i = 0; i <= 1; i++){
+				if(!players.get(i).isConnected())
+					continue;
+				try{
+					System.err.println("Problem z kontynuowaniem gry, roz³¹czam graczy");
+					players.get(i).writer.write(
+						Message.getDisconnectedMessage()
+					);
+					players.get(i).writer.flush();
+					players.get(i).socket.close();
+				}catch(Exception ex){
+					System.err.println("Nie uda³o siê roz³¹czyc graczy");
+					return;
+				}
+			}
 			e.printStackTrace();
 		}
 		
@@ -78,20 +101,25 @@ public class Game extends Thread{
 									players.get(turn).reader.readLine()
 								);
 		switch(jsonObject.getString("action").toUpperCase()){
+		
 			case "PLACE":
 				int x = jsonObject.getInt("x");
 				int y = jsonObject.getInt("y");
 				if(x < 0 || x >= 10 || y < 0 || y >= 10){
-					players.get(getOponentIndex()).writer.write(Message.getErrorMessage(404));
+					players.get(getOponentIndex()).writer.write(
+								Message.getErrorMessage(404)
+							);
 					players.get(getOponentIndex()).writer.flush();
 					game();
 				}
-				if(fields[x][y]){
-					players.get(getOponentIndex()).writer.write(Message.getErrorMessage(409));
+				if(fields[x][y] != -1){
+					players.get(getOponentIndex()).writer.write(
+								Message.getErrorMessage(409)
+							);
 					players.get(getOponentIndex()).writer.flush();
 					game();
 				}
-				fields[x][y]=true;
+				fields[x][y]=turn;
 				players.get(getOponentIndex()).writer.write(
 						Message.getOponentPlaceMessage(
 								x,
@@ -102,12 +130,18 @@ public class Game extends Thread{
 			
 			case "DISCONNECT":
 				players.get(turn).socket.close();
-				players.get(getOponentIndex()).writer.write(Message.getDisconnectedMessage());
+				players.get(getOponentIndex()).writer.write(
+							Message.getDisconnectedMessage()
+						);
 				players.get(getOponentIndex()).writer.flush();
+				players.get(getOponentIndex()).socket.close();
 				return false;
+				
 			case "CHAT":
 			default:
-				players.get(turn).writer.write(Message.getErrorMessage(401));
+				players.get(turn).writer.write(
+							Message.getErrorMessage(401)
+						);
 				players.get(turn).writer.flush();
 				game();
 		}
@@ -119,7 +153,9 @@ public class Game extends Thread{
 		try{
 			players.get(turn).writer.write(Message.getPlayerTurnMessage());
 			players.get(turn).writer.flush();
-			players.get(getOponentIndex()).writer.write(Message.getOponentTurnMessage());
+			players.get(getOponentIndex()).writer.write(
+						Message.getOponentTurnMessage()
+					);
 			players.get(getOponentIndex()).writer.flush();
 		}catch(IOException e){
 			System.err.println("Nie mo¿na wys³ac tur.");
