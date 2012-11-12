@@ -6,7 +6,7 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +79,8 @@ public class Server {
 				}
 			case "LIST GAMES":
 				return listGames();
+			case "PING":
+				return pong();
 			default:
 				return Message.getErrorMessage(404);
 		}
@@ -124,6 +126,11 @@ public class Server {
 			}
 		}
 		return Message.getErrorMessage(503);
+	}
+	
+	private static String pong() {
+		System.err.println("PING -> PONG");
+		return Message.getPongMessage();
 	}
 	
 	private static void setupSignalHandler(){

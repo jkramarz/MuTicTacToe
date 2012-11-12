@@ -32,3 +32,9 @@ W trakcie gry następuje wymiana następujących komunikatów między klientem a
 * {"action":"CHAT", "message":"MESSAGE"} - oznaczna wysłanie do drugiego gracza wiadomości o treści MESSAGE
 * {"action":"DISCONNECT"} - oznacza chęć rozłączenia się od serwera 
 W odpowiedzi może zosta przesłany komunikat {"status":"OK"} albo {"status": "ERROR", "error_code": "NUMER_BŁĘDU", "error_message": "KOMUNIKAT_BŁĘDU"}
+
+6. Debugowanie
+W trakcie połączenia z serwerem zarządzającym możliwe jest wysłanie dodatkowo następujących komunikatów:
+* {"action":"PING"} - w odpowiedzi otrzymywane jest {"status":"PONG"}
+W trakcie połączenia z serwerem gry możliwe jest wysłanie dodatkowo następujących komunikatów:
+* {"action":"DUMP"} - w odpowiedzi otrzymywany jest zrzut stanu planszy przechowywanej na serwerze 
