@@ -113,6 +113,17 @@ public class Board extends JPanel
             			//TODO: negative feedback
             			return;            	
             	}
+            	
+            	if(e.getButton() == MouseEvent.BUTTON3)
+            	{
+            		if(field[field_id] == cBlank)
+            		{
+            			field[field_id] = 3-cMine;
+            			left_cells--;
+            			statusbar.setText(Integer.toString(left_cells));
+            			rep = true;
+            		}
+            	}
 
                 if (rep) repaint();
 
