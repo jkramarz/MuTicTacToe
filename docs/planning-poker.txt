@@ -24,27 +24,41 @@ Sprint 3.
 596951	1.0	user playing a game	end the game	I'll return to main menu
 596987	2.0	user who finished a game	see the result of the game	
 596965	2.0	user playing a game	have a field with mouse over highlighted	I will have my pointer's movement feedback
-596977	3.0	game server	run in multiple threads mode	
 596978	2.0	game server running in multiple threads mode	log to file	provide usage informations and connections list
-000001  2.0 game server	disjoint set data structure	
+000001  2.0 game server	notify players when 5-in-a-row
 
 Sprint 4.
 596938	3.0	user in main menu	list network games	I would choose network game to join
 596984	3.0	game server	list network games	respond to request
 596940	1.0	user choosing network game	join network game	I would play with other player
-596981	3.0	game server	spawn artificial intelligence thread	
+596981	0.5	game server	spawn artificial intelligence thread	
 596971	2.0	artificial intelligence	receive oponent's movements	
 596972	1.0	artificial intelligence	have current game state
 596973	1.0	artificial intelligence	be able to respond to oponent's movement	
 596975	3.0	artificial intelligence	end the game when 5-in-the-row	end the thread
+000002	1.0	artificial intelligence	defend if XXXX- appears in row
+000003	0.5	artificial intelligence	defend if -XXXX appears in row
+000004	1.0	artificial intelligence	randomly respond if -XXXX- appears in row
+000005	0.5	artificial intelligence	defend if XXXX- appears in column
+000006	0.5	artificial intelligence	defend if -XXXX appears in column
+000007	0.5	artificial intelligence	randomly respond if -XXXX- appears in column
+000008	0.5	artificial intelligence	defend if XXXX- appears diagonaly
+000009	0.5	artificial intelligence	defend if -XXXX appears diagonaly
+000010	0.5	artificial intelligence	randomly respond if -XXXX- appears diagonaly
+000011	1.0	artificial intelligence attack if have XXXX- in row
+000012	0.5	artificial intelligence attack if have -XXXX in row
+000013	0.5	artificial intelligence	attack if have -XXXX- in row
+000014	1.0	artificial intelligence attack if have XXXX- in column
+000015	0.5	artificial intelligence attack if have -XXXX in column
+000016	0.5	artificial intelligence	attack if have -XXXX- in column
+000017	1.0	artificial intelligence attack if have XXXX- diagonaly
+000018	0.5	artificial intelligence attack if have -XXXX diagonaly
+000019	0.5	artificial intelligence	attack if have -XXXX- diagonaly
 
 Sprint 5.
 596976	1.0	game server	run as Linux daemon	
 596962	2.0	user playing a game	click on occupied field	get negative feedback
 596966	2.0	user playing a game	have the game board locked during the opponent's turn	I can't put too many pieces
 596952	0.5	user playing a PvP game	get notified about other player's disconnection	I wouldn't fall asleep waiting for his move
-
-Sprint \inf.
-596967	8.0	user playing PvC game	have my oponent competetive	my play will be satisfying
-596968	5.0	game server developer	have game tree generator	artificial intelligence would be able to use it
-596974	8.0	artificial intelligence	be heuresticly optimized to respond in less than 1 second	the gameplay is smooth
+000020	2.0	artificial intelligence having a turn	calculate fields values
+000021 	1.0 artificial intelligence having a turn	choose field with highest value
