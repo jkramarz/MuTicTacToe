@@ -14,10 +14,10 @@ public class Gomoku extends JFrame {
 
 	private JLabel statusbar;
 	
-	public Gomoku()
+	public Gomoku(int gameType)
 	{
 		// parametry okna
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setLocationRelativeTo(null);
         setTitle("5-in-a-row");
@@ -26,16 +26,21 @@ public class Gomoku extends JFrame {
         statusbar = new JLabel("");
         add(statusbar, BorderLayout.SOUTH);
 
-        add(new Board(statusbar));
+        add(new Board(statusbar, gameType));
 
         // wyswietlenie okna
         setResizable(false);
         setVisible(true);
+        
+        
 	}
 	
 	public static void main(String[] args)
 	{
-		new Gomoku();
+		MainMenu m = new MainMenu();
+		
+		//new Gomoku();
+		
 	}
 	
 }
