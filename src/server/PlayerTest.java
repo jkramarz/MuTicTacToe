@@ -13,6 +13,7 @@ public class PlayerTest {
 
 	@Test
 	public void testPlayer() throws IOException, InvalidAttributesException {
+		@SuppressWarnings("unused")
 		Player p;
 		try{
 			p = new Player(null);
