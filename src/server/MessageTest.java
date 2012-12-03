@@ -1,15 +1,10 @@
 package server;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
+import static org.junit.Assert.assertTrue;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import org.junit.Test;
-
-import server.Game.state;
 
 public class MessageTest {
 
