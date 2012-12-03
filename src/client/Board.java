@@ -1,15 +1,21 @@
 package client;
 
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.util.Random;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Board extends JPanel
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7710401119244316016L;
 	// parametry rodzaju gry
 	private static int local = 0;
 	private static int network = 1;
@@ -17,29 +23,29 @@ public class Board extends JPanel
 	private int gameType;
 	
 	// zmienne dotyczace grafiki
-	private final int nImages = 3; // liczba obrazkow w grze (0=blank,1=black,2=blue)
-	private final int cSize = 16; // rozmiar komorki w pikselach
-	private Image[] img; // tablica obrazkow poszczegolnych pol
+	int nImages = 3; // liczba obrazkow w grze (0=blank,1=black,2=blue)
+	int cSize = 16; // rozmiar komorki w pikselach
+	Image[] img; // tablica obrazkow poszczegolnych pol
 	
 	// kody stanow komorek
-	private final int cBlank = 0;
-	private final int cBlack = 1;
-	private final int cBlue = 2;
+	public static final int cBlank = 0;
+	public static final int cBlack = 1;
+	public static final int cBlue = 2;
 	
 	// pionek gracza
-	private final int cMine=cBlack;
-	private final int cHis = cBlue;
+	int cMine=cBlack;
+	int cHis = cBlue;
 	
 	// gameplay variables
-	private int[] field; // tablica zawartosci komorki
-	private int rows = 10; // ilosc wierszy
-	private int cols = 10; // ilosc kolumn
-	private int all_cells; // laczna ilosc komorek
-	private int left_cells; // komorki niezapelnione
-	private boolean isMyTurn; // id gracza wykonujacego ruch (1=local, 0=socket) 
+	int[] field; // tablica zawartosci komorki
+	int rows = 10; // ilosc wierszy
+	int cols = 10; // ilosc kolumn
+	int all_cells; // laczna ilosc komorek
+	int left_cells; // komorki niezapelnione
+	boolean isMyTurn; // id gracza wykonujacego ruch (1=local, 0=socket) 
 	//private static int ME = 1; private static int HIM = 2;
 	
-	private JLabel statusbar; // pasek stanu
+	JLabel statusbar; // pasek stanu
 	
 	// ladujemy obrazki do tablicy
 	public Board(JLabel statusbar, int gameType) 

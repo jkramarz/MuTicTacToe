@@ -1,19 +1,20 @@
 package client;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-
-import javax.swing.*;
+import javax.swing.JFrame;
 
 public class MainMenu extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3059271023307939391L;
 	// parametry rodzaju gry
-	private static int local = 0;
-	private static int network = 1;
+	final static int local = 0;
+	final static int network = 1;
 
 	// wymiary okienka
-	private final int WIDTH = 170;
-	private final int HEIGHT = 210;
+	int WIDTH = 170;
+	int HEIGHT = 210;
 	
 	public MainMenu()
 	{

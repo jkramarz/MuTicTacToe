@@ -1,13 +1,16 @@
 package client;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
 
-import client.Board;
-
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 public class Gomoku extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9216930946594064363L;
 	// wymiary okienka
 	private final int WIDTH = 170;
 	private final int HEIGHT = 210;
