@@ -12,7 +12,7 @@ public class Game extends Thread{
 	ServerSocket serversocket;
 	ArrayList<Player> players;
 	state turn;
-	String gameName;
+	String gameName = null;
 	state[][] fields;
 	
 	public static enum state{
