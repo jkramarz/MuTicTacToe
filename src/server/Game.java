@@ -8,15 +8,18 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 public class Game extends Thread{
-	private int port;
-	private ServerSocket serversocket;
-	private ArrayList<Player> players;
-	private int turn;
-	private String gameName;
-	int[][] fields;
+	int port;
+	ServerSocket serversocket;
+	ArrayList<Player> players;
+	state turn;
+	String gameName;
+	state[][] fields;
 	
-	@SuppressWarnings("unused")
-	private Game(){}
+	public static enum state{
+		BLANK, FIRST, SECOND
+	}
+	
+	protected Game(){}
 	
 	public Game(int i, String n){
 		this(i);
@@ -25,10 +28,10 @@ public class Game extends Thread{
 	
 	public Game(int i) {
 		port = i;
-		fields = new int[10][10];
+		fields = new state[10][10];
 		for(int x = 0; x < 10; x++){
 			for(int y = 0; y < 10; y++){
-				fields[x][y]=-1;
+				fields[x][y]=state.BLANK;
 			}
 		}
 	}
@@ -57,9 +60,9 @@ public class Game extends Thread{
 												  )
 							        ).getString("action");
 					if(action == "ME"){
-						turn = 0;
+						turn = state.FIRST;
 					}else{
-						turn = 1;
+						turn = state.SECOND;
 					}
 				}else{
 					players.get(0).writer.write(Message.getConnectedMessage());
@@ -76,7 +79,7 @@ public class Game extends Thread{
 			do{
 				sendTurns();
 				end_of_game = !game();
-				turn = getOponentIndex();
+				turn = getOponent();
 			}while(
 					!end_of_game &&
 					players.get(0).isConnected() && 
@@ -111,7 +114,7 @@ public class Game extends Thread{
 	private Boolean game() throws IOException{
 		
 		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-									players.get(turn).reader.readLine()
+									players.get(turn == state.FIRST ? 0 : 1).reader.readLine()
 								);
 		switch(jsonObject.getString("action").toUpperCase()){
 		
@@ -119,21 +122,21 @@ public class Game extends Thread{
 				int x = jsonObject.getInt("x");
 				int y = jsonObject.getInt("y");
 				if(x < 0 || x >= 10 || y < 0 || y >= 10){
-					players.get(getOponentIndex()).writer.write(
+					players.get(getPlayerIndex(getOponent())).writer.write(
 								Message.getErrorMessage(404)
 							);
-					players.get(getOponentIndex()).writer.flush();
+					players.get(getPlayerIndex(getOponent())).writer.flush();
 					game();
 				}
-				if(fields[x][y] != -1){
-					players.get(getOponentIndex()).writer.write(
+				if(fields[x][y] != state.BLANK){
+					players.get(getPlayerIndex(getOponent())).writer.write(
 								Message.getErrorMessage(409)
 							);
-					players.get(getOponentIndex()).writer.flush();
+					players.get(getPlayerIndex(getOponent())).writer.flush();
 					game();
 				}
 				fields[x][y]=turn;
-				players.get(getOponentIndex()).writer.write(
+				players.get(getPlayerIndex(getOponent())).writer.write(
 						Message.getOponentPlaceMessage(
 								x,
 								y
@@ -142,20 +145,20 @@ public class Game extends Thread{
 				return true;
 			
 			case "DISCONNECT":
-				players.get(turn).socket.close();
-				players.get(getOponentIndex()).writer.write(
+				players.get(getPlayerIndex(turn)).socket.close();
+				players.get(getPlayerIndex(getOponent())).writer.write(
 							Message.getDisconnectedMessage()
 						);
-				players.get(getOponentIndex()).writer.flush();
-				players.get(getOponentIndex()).socket.close();
+				players.get(getPlayerIndex(getOponent())).writer.flush();
+				players.get(getPlayerIndex(getOponent())).socket.close();
 				return false;
 				
 			case "CHAT":
 			default:
-				players.get(turn).writer.write(
+				players.get(getPlayerIndex(turn)).writer.write(
 							Message.getErrorMessage(401)
 						);
-				players.get(turn).writer.flush();
+				players.get(getPlayerIndex(turn)).writer.flush();
 				game();
 		}
 		return true;
@@ -164,17 +167,24 @@ public class Game extends Thread{
 	
 	private void sendTurns() {
 		try{
-			players.get(turn).writer.write(Message.getPlayerTurnMessage());
-			players.get(turn).writer.flush();
-			players.get(getOponentIndex()).writer.write(
+			players.get(getPlayerIndex(turn)).writer.write(Message.getPlayerTurnMessage());
+			players.get(getPlayerIndex(turn)).writer.flush();
+			players.get(getPlayerIndex(getOponent())).writer.write(
 						Message.getOponentTurnMessage()
 					);
-			players.get(getOponentIndex()).writer.flush();
+			players.get(getPlayerIndex(getOponent())).writer.flush();
 		}catch(IOException e){
 			System.err.println("Nie mo¿na wys³ac tur.");
 		}
 	}
-	private int getOponentIndex(){
-		return (turn+1) % 2;
+	private state getOponent(){
+		if(turn == state.FIRST)
+			return state.SECOND;
+		return state.FIRST;
+	}
+	private int getPlayerIndex(state t){
+		if(t == state.FIRST)
+			return 0;
+		return 1;
 	}
 }
