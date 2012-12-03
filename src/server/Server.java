@@ -17,12 +17,13 @@ import net.sf.json.*;
  *
  */
 public class Server {
-	private static int port = 10001;
-	private static int port_start = 10010;
-	private static int port_end = 10020;
+	static int port = 10001;
+	static int port_start = 10010;
+	static int port_end = 10020;
 	
 	static Map<Integer, Game> games = new HashMap<>();
 	private static Boolean interupted = false;
+	static ServerSocket serversocket;
 
 	/**
 	 * @param args
@@ -31,7 +32,7 @@ public class Server {
 		System.err.println("Server is starting up...");
 		setupSignalHandler();
 		//try{
-			ServerSocket serversocket = new ServerSocket(port);
+			serversocket = new ServerSocket(port);
 			while(!interupted){
 				Socket socket = serversocket.accept();
 				try{
