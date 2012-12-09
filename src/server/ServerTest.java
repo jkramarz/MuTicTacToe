@@ -7,8 +7,8 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class ServerTest {
-	
-	class Main implements Runnable{
+
+	class Main implements Runnable {
 		@Override
 		public void run() {
 			try {
@@ -18,16 +18,16 @@ public class ServerTest {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testMain() throws IOException {
-		
-		
+
 		Thread t = new Thread(new Main());
-		t.run(); //does not end! ;-(
+		t.run(); // does not end! ;-(
 		assertTrue("Server is bound to port", Server.serversocket.isBound());
-		assertTrue("Server is bound to specified port", Server.serversocket.getLocalPort() == Server.port);
+		assertTrue("Server is bound to specified port",
+				Server.serversocket.getLocalPort() == Server.port);
 		t.stop();
 	}
 

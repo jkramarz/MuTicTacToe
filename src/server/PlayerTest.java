@@ -15,18 +15,18 @@ public class PlayerTest {
 	public void testPlayer() throws IOException, InvalidAttributesException {
 		@SuppressWarnings("unused")
 		Player p;
-		try{
+		try {
 			p = new Player(null);
-		}catch(InvalidAttributesException e){
+		} catch (InvalidAttributesException e) {
 			assertTrue(e.getMessage() == "Player socket must exists!");
 		}
-		
-		try{
+
+		try {
 			Socket s = new Socket();
 			p = new Player(s);
-		}catch(InvalidAttributesException e){
+		} catch (InvalidAttributesException e) {
 			assertTrue(e.getMessage() == "Player socket must be connected!");
 		}
-		
+
 	}
 }

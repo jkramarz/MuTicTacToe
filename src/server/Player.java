@@ -13,35 +13,30 @@ class Player {
 	BufferedReader reader;
 	BufferedWriter writer;
 	Socket socket;
-	
-	Player(Socket s) throws IOException, InvalidAttributesException{
-	   if(s == null)
-		   throw new InvalidAttributesException("Player socket must exists!");
-	   if(s.isConnected() == false)
-		   throw new InvalidAttributesException("Player socket must be connected!");
-	   socket = s;
-       reader = new BufferedReader(
-    		   		new InputStreamReader(
-    		   			socket.getInputStream()
-    		   		)
-    		   );
-       writer = new BufferedWriter(
-    		    	new OutputStreamWriter(
-						socket.getOutputStream()
-					)
-				);
+
+	Player(Socket s) throws IOException, InvalidAttributesException {
+		if (s == null)
+			throw new InvalidAttributesException("Player socket must exists!");
+		if (s.isConnected() == false)
+			throw new InvalidAttributesException(
+					"Player socket must be connected!");
+		socket = s;
+		reader = new BufferedReader(new InputStreamReader(
+				socket.getInputStream()));
+		writer = new BufferedWriter(new OutputStreamWriter(
+				socket.getOutputStream()));
 	}
-	
-	public BufferedReader getReader(){
+
+	public BufferedReader getReader() {
 		return reader;
 	}
-	
-	public BufferedWriter getWriter(){
+
+	public BufferedWriter getWriter() {
 		return writer;
 	}
-	
-	boolean isConnected(){
+
+	boolean isConnected() {
 		return socket.isConnected();
 	}
-	
+
 }

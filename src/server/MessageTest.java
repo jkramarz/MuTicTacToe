@@ -8,17 +8,18 @@ import org.junit.Test;
 
 public class MessageTest {
 
-	int[] codes = {503, 501, 409, 403, 0};
-	
+	int[] codes = { 503, 501, 409, 403, 0 };
+
 	@Test
 	public void testGetErrorMessage() {
-		for(int i : codes){
-			JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-					Message.getErrorMessage(i)
-				);
+		for (int i : codes) {
+			JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+					.getErrorMessage(i));
 			assertTrue(jsonObject.getString("status") == "ERROR");
-			assertTrue(jsonObject.getString("error_code") == new Integer(i).toString());
-			assertTrue(jsonObject.getString("error_message") == Message.getErrorText(i));
+			assertTrue(jsonObject.getString("error_code") == new Integer(i)
+					.toString());
+			assertTrue(jsonObject.getString("error_message") == Message
+					.getErrorText(i));
 		}
 	}
 
@@ -34,52 +35,46 @@ public class MessageTest {
 
 	@Test
 	public void testGetNewGameMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getNewGameMessage(0)
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getNewGameMessage(0));
 		assertTrue(jsonObject.getString("status") == "OK");
 		assertTrue(jsonObject.getString("port") == new Integer(0).toString());
 	}
 
 	@Test
 	public void testGetChooseSideMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getChooseSideMessage()
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getChooseSideMessage());
 		assertTrue(jsonObject.getString("status") == "WHO STARTS");
 	}
 
 	@Test
 	public void testGetPlayerTurnMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getPlayerTurnMessage()
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getPlayerTurnMessage());
 		assertTrue(jsonObject.getString("status") == "TURN");
 		assertTrue(jsonObject.getString("attribute") == "YOUR");
 	}
 
 	@Test
 	public void testGetOponentTurnMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getPlayerTurnMessage()
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getPlayerTurnMessage());
 		assertTrue(jsonObject.getString("status") == "TURN");
 		assertTrue(jsonObject.getString("attribute") == "OPONENT");
 	}
 
 	@Test
 	public void testGetDisconnectedMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getDisconnectedMessage()
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getDisconnectedMessage());
 		assertTrue(jsonObject.getString("status") == "DISCONNECTED");
 	}
 
 	@Test
 	public void testGetOponentPlaceMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getOponentPlaceMessage(1, 2)
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getOponentPlaceMessage(1, 2));
 		assertTrue(jsonObject.getString("status") == "PLACE");
 		assertTrue(jsonObject.getString("x") == new Integer(1).toString());
 		assertTrue(jsonObject.getString("y") == new Integer(2).toString());
@@ -87,17 +82,15 @@ public class MessageTest {
 
 	@Test
 	public void testGetConnectedMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getConnectedMessage()
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getConnectedMessage());
 		assertTrue(jsonObject.getString("status") == "CONNECTED");
 	}
 
 	@Test
 	public void testGetPongMessage() {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(
-				Message.getPongMessage()
-			);
+		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(Message
+				.getPongMessage());
 		assertTrue(jsonObject.getString("status") == "PONG");
 	}
 
