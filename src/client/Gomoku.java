@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class Gomoku extends JFrame {
-	
+
 	/**
 	 * 
 	 */
@@ -16,35 +16,32 @@ public class Gomoku extends JFrame {
 	private final int HEIGHT = 210;
 
 	private JLabel statusbar;
-	
-	public Gomoku(int gameType)
-	{
+
+	public Gomoku(int gameType) {
 		// parametry okna
-		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(WIDTH, HEIGHT);
-        setLocationRelativeTo(null);
-        setTitle("5-in-a-row");
-        
-        // pasek stanu
-        statusbar = new JLabel("");
-        add(statusbar, BorderLayout.SOUTH);
+		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(WIDTH, HEIGHT);
+		setLocationRelativeTo(null);
+		setTitle("5-in-a-row");
 
-        add(new Board(statusbar, gameType));
+		// pasek stanu
+		statusbar = new JLabel("");
+		add(statusbar, BorderLayout.SOUTH);
 
-        // wyswietlenie okna
-        setResizable(false);
-        setVisible(true);
-        
-        
+		add(new Board(statusbar, gameType));
+
+		// wyswietlenie okna
+		setResizable(false);
+		setVisible(true);
+
 	}
-	
-	public static void main(String[] args)
-	{
+
+	public static void main(String[] args) {
 		MainMenu m = new MainMenu();
 		m.initComponents();
-		
-		//new Gomoku();
-		
+
+		// new Gomoku();
+
 	}
-	
+
 }
