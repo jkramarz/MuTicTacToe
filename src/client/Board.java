@@ -131,13 +131,11 @@ public class Board extends JPanel
             		{
             			field[field_id] = cMine;
             			left_cells--;
-            			//statusbar.setText(Integer.toString(left_cells));
             			rep = true; // zmien flage - trzeba zaktualizowac plansze
             			isMyTurn = !isMyTurn;
             			statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
             		} else
             			//TODO: negative feedback
-            			//Toolkit.getDefaultToolkit().beep();
             			return;            	
             	}
             	
@@ -147,7 +145,6 @@ public class Board extends JPanel
             		{
             			field[field_id] = 3-cMine;
             			left_cells--;
-            			//statusbar.setText(Integer.toString(left_cells));
             			rep = true;
             			isMyTurn = !isMyTurn;
             			statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
@@ -156,9 +153,7 @@ public class Board extends JPanel
 
                 if (rep)
                 {
-                	if(gameType == local) aiMove(field);
                 	repaint();
-                	
                 }
                 	
 
@@ -166,33 +161,6 @@ public class Board extends JPanel
         }
     }
 	
-	public void aiMove(int[] field)
-	{
-		int iStart;
-		int jStart;
-		
-		Random randomi = new Random();
-		Random randomj = new Random();
-		
-		iStart = (int) (rows * randomi.nextDouble());
-		jStart = (int) (cols * randomj.nextDouble());
-		
-		for (int i=iStart;i<rows;i++)
-		{
-			for (int j=jStart;j<cols;j++)
-			{
-				
-				if (field[(i * cols) + j]==cBlank) 
-				{
-					field[(i * cols) + j] = cHis;
-					isMyTurn = !isMyTurn;
-					statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
-					repaint();
-					return;
-				}
-			}
-		}
-	}
 }
 
 
