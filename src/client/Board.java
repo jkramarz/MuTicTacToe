@@ -168,7 +168,6 @@ public class Board extends JPanel
 	
 	public void aiMove(int[] field)
 	{
-		int cell;
 		int iStart;
 		int jStart;
 		

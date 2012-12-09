@@ -41,6 +41,7 @@ public class Gomoku extends JFrame {
 	public static void main(String[] args)
 	{
 		MainMenu m = new MainMenu();
+		m.initComponents();
 		
 		//new Gomoku();
 		
