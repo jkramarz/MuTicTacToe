@@ -55,6 +55,7 @@ public class Game extends Thread {
 			for (int i = 0; i < 2; i++) {
 				Player player = new Player(serversocket.accept());
 				System.err.println("Gracz " + i + " po³¹czony.");
+				//TODO
 				if (i == 0 && false) {
 					player.writer.write(Message.getChooseSideMessage());
 					player.writer.flush();
