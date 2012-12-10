@@ -18,6 +18,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+
 public class Board extends JPanel {
 	/**
 	 * 
@@ -39,12 +42,12 @@ public class Board extends JPanel {
 	int cHis = cBlue;
 
 	// gameplay variables
-	int[] field; // tablica zawartosci komorki
+	volatile int[] field; // tablica zawartosci komorki
 	int rows = 10; // ilosc wierszy
 	int cols = 10; // ilosc kolumn
 	int all_cells = rows * cols; // laczna ilosc komorek
 	int left_cells = all_cells; // komorki niezapelnione
-	boolean isMyTurn; // id gracza wykonujacego ruch (true=local, false=socket)
+	volatile boolean isMyTurn = false; // id gracza wykonujacego ruch (true=local, false=socket)
 	// private static int ME = 1; private static int HIM = 2;
 
 	JLabel statusbar; // pasek stanu
@@ -63,9 +66,8 @@ public class Board extends JPanel {
 				socket.getInputStream()));
 		bufferedWritter = new BufferedWriter(new OutputStreamWriter(
 				socket.getOutputStream()));
-		JOptionPane.showMessageDialog(null,host+port);
-				
-				
+		JOptionPane.showMessageDialog(null, host + port);
+
 		img = new Image[nImages];
 
 		// pobieramy obrazki z paczki o nazwach 0.png, 1.png...nImages.png
@@ -86,9 +88,7 @@ public class Board extends JPanel {
 		all_cells = rows * cols;
 		left_cells = all_cells;
 		field = new int[all_cells];
-
-		isMyTurn = true;
-
+		
 		for (int i = 0; i < all_cells; i++)
 			field[i] = cBlank;
 
@@ -102,8 +102,47 @@ public class Board extends JPanel {
 			@Override
 			protected Object doInBackground() throws Exception {
 				while (!end) {
-					JOptionPane.showMessageDialog(null,
-							bufferedReader.readLine());
+					JSONObject jsonObject = (JSONObject) JSONSerializer
+							.toJSON(bufferedReader.readLine());
+					switch (jsonObject.getString("status").toUpperCase()) {
+					case "TURN":
+						switch (jsonObject.getString("attribute")) {
+						case "YOUR":
+							isMyTurn = true;
+							break;
+						case "OPONENT":
+							isMyTurn = false;
+							break;
+						}
+						break;
+					case "PLACE":
+						Integer x = new Integer(jsonObject.getString("X"));
+						Integer y = new Integer(jsonObject.getString("Y"));
+						field[getFieldId(x, y)] = cHis;
+						repaint();
+						break;
+					case "WIN":
+						switch (jsonObject.getString("attribute")) {
+						case "YOUR":
+							//TODO
+						case "OPONENT":
+							//TODO
+						}
+						break;
+					case "DISCONNECT":
+						switch (jsonObject.getString("attribute")) {
+						case "SERVER":
+							//TODO
+						case "OPONENT":
+							//TODO
+						}
+						break;
+					case "CONNECTED":
+						//TODO
+						break;
+					default:
+						throw new Exception();
+					}
 
 				}
 				// TODO Auto-generated method stub
@@ -129,6 +168,10 @@ public class Board extends JPanel {
 		}
 	}
 
+	int getFieldId(int cRow, int cCol) {
+		return (cRow * cols) + cCol;
+	}
+
 	// obserwator klikniec myszki
 	class BoardAdapter extends MouseAdapter {
 		public void mousePressed(MouseEvent e) {
@@ -144,7 +187,7 @@ public class Board extends JPanel {
 			int cCol = x / cSize;
 			int cRow = y / cSize;
 
-			int field_id = (cRow * cols) + cCol; // id pola, uzywany w tablicy
+			int field_id = getFieldId(cRow, cCol); // id pola, uzywany w tablicy
 													// fields[]
 
 			// flaga - koniecznosc aktualizacji planszy

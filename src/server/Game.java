@@ -11,7 +11,7 @@ public class Game extends Thread {
 	int port;
 	ServerSocket serversocket;
 	ArrayList<Player> players;
-	state turn;
+	state turn = state.FIRST;
 	String gameName = null;
 	state[][] fields;
 
@@ -54,7 +54,8 @@ public class Game extends Thread {
 		try {
 			for (int i = 0; i < 2; i++) {
 				Player player = new Player(serversocket.accept());
-				if (i == 0) {
+				System.err.println("Gracz " + i + " po³¹czony.");
+				if (i == 0 && false) {
 					player.writer.write(Message.getChooseSideMessage());
 					player.writer.flush();
 					String action = ((JSONObject) JSONSerializer
@@ -65,7 +66,7 @@ public class Game extends Thread {
 					} else {
 						turn = state.SECOND;
 					}
-				} else {
+				} else if(i == 1) {
 					players.get(0).writer.write(Message.getConnectedMessage());
 					players.get(0).writer.flush();
 				}
