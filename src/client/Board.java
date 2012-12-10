@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -47,7 +49,8 @@ public class Board extends JPanel {
 	int cols = 10; // ilosc kolumn
 	int all_cells = rows * cols; // laczna ilosc komorek
 	int left_cells = all_cells; // komorki niezapelnione
-	volatile boolean isMyTurn = false; // id gracza wykonujacego ruch (true=local, false=socket)
+	volatile boolean isMyTurn = false; // id gracza wykonujacego ruch
+										// (true=local, false=socket)
 	// private static int ME = 1; private static int HIM = 2;
 
 	JLabel statusbar; // pasek stanu
@@ -88,7 +91,7 @@ public class Board extends JPanel {
 		all_cells = rows * cols;
 		left_cells = all_cells;
 		field = new int[all_cells];
-		
+
 		for (int i = 0; i < all_cells; i++)
 			field[i] = cBlank;
 
@@ -116,29 +119,31 @@ public class Board extends JPanel {
 						}
 						break;
 					case "PLACE":
-						Integer x = new Integer(jsonObject.getString("X").trim());
-						Integer y = new Integer(jsonObject.getString("Y").trim());
+						Integer x = new Integer(jsonObject.getString("X")
+								.trim());
+						Integer y = new Integer(jsonObject.getString("Y")
+								.trim());
 						field[getFieldId(x, y)] = cHis;
 						repaint();
 						break;
 					case "WIN":
 						switch (jsonObject.getString("attribute").trim()) {
 						case "YOUR":
-							//TODO
+							// TODO
 						case "OPONENT":
-							//TODO
+							// TODO
 						}
 						break;
 					case "DISCONNECT":
 						switch (jsonObject.getString("attribute").trim()) {
 						case "SERVER":
-							//TODO
+							// TODO
 						case "OPONENT":
-							//TODO
+							// TODO
 						}
 						break;
 					case "CONNECTED":
-						//TODO
+						// TODO
 						break;
 					default:
 						throw new Exception();
@@ -172,6 +177,13 @@ public class Board extends JPanel {
 		return (cRow * cols) + cCol;
 	}
 
+	Map<String, String> getCoordsFromFieldId(int id) {
+		Map<String, String> result = new HashMap<>();
+		result.put("x", new Integer(id % cols).toString());
+		result.put("y", new Integer(id / cols).toString());
+		return result;
+	}
+
 	// obserwator klikniec myszki
 	class BoardAdapter extends MouseAdapter {
 		public void mousePressed(MouseEvent e) {
@@ -199,27 +211,28 @@ public class Board extends JPanel {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					// poloz pionek tylko gdy pole jest puste
 					if (field[field_id] == cBlank) {
-						field[field_id] = cMine;
-						left_cells--;
-						rep = true; // zmien flage - trzeba zaktualizowac
-									// plansze
-						isMyTurn = !isMyTurn;
-						statusbar.setText(isMyTurn ? "Your Turn."
-								: "Waiting for opponent...");
+						try {
+							Map<String, String> message = getCoordsFromFieldId(field_id);
+							message.put("action", "PLACE");
+							bufferedWritter.write(JSONSerializer
+									.toJSON(message).toString());
+							bufferedWritter.flush();
+
+							field[field_id] = cMine;
+							left_cells--;
+							rep = true; // zmien flage - trzeba zaktualizowac
+										// plansze
+							isMyTurn = !isMyTurn;
+							statusbar.setText(isMyTurn ? "Your Turn."
+									: "Waiting for opponent...");
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
 					} else
 						// TODO: negative feedback
 						return;
-				}
-
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					if (field[field_id] == cBlank) {
-						field[field_id] = 3 - cMine;
-						left_cells--;
-						rep = true;
-						isMyTurn = !isMyTurn;
-						statusbar.setText(isMyTurn ? "Your Turn."
-								: "Waiting for opponent...");
-					}
 				}
 
 				if (rep) {

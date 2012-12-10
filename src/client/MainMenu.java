@@ -17,8 +17,9 @@ public class MainMenu extends JFrame {
 	int WIDTH = 170;
 	int HEIGHT = 210;
 
-	//TODO
+	// TODO
 	String host = "localhost";
+
 	public MainMenu() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
@@ -52,7 +53,6 @@ public class MainMenu extends JFrame {
 
 	void initComponents() throws InterruptedException {
 
-		
 		try {
 			ManagementConnection mc = new ManagementConnection(host, 10001);
 			mc.createConnection();
@@ -62,7 +62,6 @@ public class MainMenu extends JFrame {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Connection failed.");
 		}
-		
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -216,7 +215,7 @@ public class MainMenu extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void joinMouseClicked(java.awt.event.MouseEvent evt) {
 		new Client(host, lastport);
 	}
