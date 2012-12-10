@@ -9,8 +9,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.CountDownLatch;
 
-import javax.swing.JOptionPane;
-
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
@@ -24,6 +22,7 @@ public class ManagementConnection {
 	volatile BufferedWriter bufferedWritter;
 	String command;
 	String result;
+
 
 	ManagementConnection(String host, Integer port) {
 		gamehost = host;
@@ -86,7 +85,6 @@ public class ManagementConnection {
 	public Integer createNewPvcGame() throws Exception {
 		Integer port = null;
 		String result = sendCommand("{\"action\": \"NEW GAME\", \"type\": \"PVC\"}");
-		JOptionPane.showMessageDialog(null, (String)result);
 		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(result);
 		switch (jsonObject.getString("status").toUpperCase()) {
 		case "OK":

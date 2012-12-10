@@ -18,6 +18,8 @@ public class MainMenu extends JFrame {
 	int WIDTH = 170;
 	int HEIGHT = 210;
 
+	//TODO
+	String host = "localhost";
 	public MainMenu() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
@@ -47,10 +49,11 @@ public class MainMenu extends JFrame {
 	private javax.swing.JButton exitButton = new javax.swing.JButton("Wyjœcie");
 	private javax.swing.JLabel jLabel1 = new javax.swing.JLabel("Gomoku");
 	private javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+	private int lastport;
 
 	void initComponents() throws InterruptedException {
 
-		mc = new ManagementConnection("localhost", 10001);
+		mc = new ManagementConnection(host, 10001);
 		try {
 			mc.createConnection();
 			mc.sendCommand("{\"action\":\"PING\"}");
@@ -82,7 +85,7 @@ public class MainMenu extends JFrame {
 		// BUTTON — do³¹cz do gry
 		joinButton.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				pvcMouseClicked(evt);
+				joinMouseClicked(evt);
 			}
 		});
 
@@ -187,8 +190,8 @@ public class MainMenu extends JFrame {
 	private void pvpButtonMouseClicked(java.awt.event.MouseEvent evt) {
 		Integer port;
 		try {
-			port = mc.createNewPvpGame();
-			new Client(port);
+			lastport = port = mc.createNewPvpGame();
+			new Client(host, port);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,12 +201,16 @@ public class MainMenu extends JFrame {
 	private void pvcMouseClicked(java.awt.event.MouseEvent evt) {
 		Integer port;
 		try {
-			port = mc.createNewPvcGame();
-			new Client(port);
+			lastport = port = mc.createNewPvcGame();
+			new Client(host, port);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void joinMouseClicked(java.awt.event.MouseEvent evt) {
+		new Client(host, lastport);
 	}
 
 	private void exitMouseClicked(java.awt.event.MouseEvent evt) {

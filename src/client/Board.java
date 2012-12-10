@@ -4,22 +4,25 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 public class Board extends JPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7710401119244316016L;
-	// parametry rodzaju gry
-	private static int local = 0;
-	private static int network = 1;
-
-	private int gameType;
 
 	// zmienne dotyczace grafiki
 	int nImages = 3; // liczba obrazkow w grze (0=blank,1=black,2=blue)
@@ -39,18 +42,30 @@ public class Board extends JPanel {
 	int[] field; // tablica zawartosci komorki
 	int rows = 10; // ilosc wierszy
 	int cols = 10; // ilosc kolumn
-	int all_cells = rows*cols; // laczna ilosc komorek
+	int all_cells = rows * cols; // laczna ilosc komorek
 	int left_cells = all_cells; // komorki niezapelnione
 	boolean isMyTurn; // id gracza wykonujacego ruch (true=local, false=socket)
 	// private static int ME = 1; private static int HIM = 2;
 
 	JLabel statusbar; // pasek stanu
 
-	// ladujemy obrazki do tablicy
-	public Board(JLabel statusbar, int gameType) {
-		this.statusbar = statusbar;
-		this.gameType = gameType;
+	Socket socket;
+	volatile BufferedReader bufferedReader;
+	volatile BufferedWriter bufferedWritter;
 
+	// ladujemy obrazki do tablicy
+	public Board(JLabel statusbar, String host, int port)
+			throws UnknownHostException, IOException {
+		this.statusbar = statusbar;
+
+		socket = new Socket(host, port);
+		bufferedReader = new BufferedReader(new InputStreamReader(
+				socket.getInputStream()));
+		bufferedWritter = new BufferedWriter(new OutputStreamWriter(
+				socket.getOutputStream()));
+		JOptionPane.showMessageDialog(null,host+port);
+				
+				
 		img = new Image[nImages];
 
 		// pobieramy obrazki z paczki o nazwach 0.png, 1.png...nImages.png
@@ -80,6 +95,26 @@ public class Board extends JPanel {
 		// pasek stanu
 		statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
 
+		@SuppressWarnings("rawtypes")
+		class Worker extends SwingWorker {
+			boolean end = false;
+
+			@Override
+			protected Object doInBackground() throws Exception {
+				while (!end) {
+					JOptionPane.showMessageDialog(null,
+							bufferedReader.readLine());
+
+				}
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+		}
+
+		Worker worker = new Worker();
+		worker.execute();
+
 	}
 
 	// rysowanie planszy
@@ -99,7 +134,7 @@ public class Board extends JPanel {
 		public void mousePressed(MouseEvent e) {
 
 			// nie rob nic jezeli ruch nalezy do przeciwnika
-			if (!isMyTurn && (gameType == network))
+			if (!isMyTurn)
 				return;
 
 			// zamiana wspolrzednych na konkretne pole

@@ -48,6 +48,7 @@ public class Game extends Thread {
 			serversocket = new ServerSocket(port);
 		} catch (Exception e) {
 			System.err.println("Nie uda³o siê zaj¹c portu " + port);
+			e.printStackTrace();
 		}
 
 		try {
@@ -71,7 +72,7 @@ public class Game extends Thread {
 				players.add(player);
 			}
 		} catch (Exception e) {
-			System.err.println("Nie uda³o siê uzyskac po³¹czenia z graczami.");
+			e.printStackTrace();
 		}
 
 		try {
