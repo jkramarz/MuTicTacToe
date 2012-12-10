@@ -1,8 +1,5 @@
 package client;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -15,6 +12,7 @@ public class MainMenu extends JFrame {
 	// parametry rodzaju gry
 	final static int local = 0;
 	final static int network = 1;
+	private ManagementConnection mc;
 
 	// wymiary okienka
 	int WIDTH = 170;
@@ -40,51 +38,58 @@ public class MainMenu extends JFrame {
 	 * }
 	 */
 
-	private javax.swing.JButton jButton1 = new javax.swing.JButton(
-			"Gra lokalna");
-	private javax.swing.JButton jButton2 = new javax.swing.JButton(
-			"Gra sieciowa");
-	private javax.swing.JButton jButton4 = new javax.swing.JButton("WYJŒCIE");
-	private javax.swing.JLabel jLabel1 = new javax.swing.JLabel("MENU G£ÓWNE");
+	private javax.swing.JButton pvpButton = new javax.swing.JButton(
+			"Nowa gra PvP");
+	private javax.swing.JButton pvcButton = new javax.swing.JButton(
+			"Nowa gra PvC");
+	private javax.swing.JButton joinButton = new javax.swing.JButton(
+			"Do³¹cz do gry");
+	private javax.swing.JButton exitButton = new javax.swing.JButton("Wyjœcie");
+	private javax.swing.JLabel jLabel1 = new javax.swing.JLabel("Gomoku");
 	private javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
 
 	void initComponents() throws InterruptedException {
 
-		ManagementConnection mc = new ManagementConnection("localhost", 10001);
+		mc = new ManagementConnection("localhost", 10001);
 		try {
 			mc.createConnection();
-			mc.execute();
-			JOptionPane.showMessageDialog(null, mc.sendCommand("{\"action\":\"PING\"}"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			mc.sendCommand("{\"action\":\"PING\"}");
+			JOptionPane.showMessageDialog(null, "Connection successfull.");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Connection failed.");
 		}
-		
-		
+
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
 		// napis g³ówny
 		jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
 		jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-		// BUTTON — gra lokalna (PvC)
-		jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+		// BUTTON — nowa gra PvP
+		pvpButton.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				jButton1MouseClicked(evt);
+				pvpButtonMouseClicked(evt);
 			}
 		});
 
-		// BUTTON — gra sieciowa
-		jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+		// BUTTON — nowa gra PvC
+		pvcButton.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				jButton2MouseClicked(evt);
+				pvcMouseClicked(evt);
+			}
+		});
+
+		// BUTTON — do³¹cz do gry
+		joinButton.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				pvcMouseClicked(evt);
 			}
 		});
 
 		// button — wyjœcie
-		jButton4.addMouseListener(new java.awt.event.MouseAdapter() {
+		exitButton.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				jButton4MouseClicked(evt);
+				exitMouseClicked(evt);
 			}
 		});
 
@@ -124,17 +129,22 @@ public class MainMenu extends JFrame {
 																								javax.swing.GroupLayout.Alignment.LEADING,
 																								false)
 																						.addComponent(
-																								jButton2,
+																								pvcButton,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								Short.MAX_VALUE)
 																						.addComponent(
-																								jButton1,
+																								pvpButton,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								Short.MAX_VALUE)
 																						.addComponent(
-																								jButton4,
+																								joinButton,
+																								javax.swing.GroupLayout.DEFAULT_SIZE,
+																								javax.swing.GroupLayout.DEFAULT_SIZE,
+																								Short.MAX_VALUE)
+																						.addComponent(
+																								exitButton,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								Short.MAX_VALUE))))
@@ -146,9 +156,10 @@ public class MainMenu extends JFrame {
 				jPanel1Layout.createSequentialGroup()
 						.addContainerGap(22, Short.MAX_VALUE)
 						.addComponent(jLabel1).addGap(30, 30, 30)
-						.addComponent(jButton1).addGap(26, 26, 26)
-						.addComponent(jButton2).addGap(37, 37, 37)
-						.addComponent(jButton4)
+						.addComponent(pvpButton).addGap(26, 26, 26)
+						.addComponent(pvcButton).addGap(26, 26, 26)
+						.addComponent(joinButton).addGap(26, 26, 26)
+						.addComponent(exitButton)
 						.addContainerGap(76, Short.MAX_VALUE)));
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
@@ -173,15 +184,29 @@ public class MainMenu extends JFrame {
 		pack();
 	}
 
-	private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {
-		new Client(local);
+	private void pvpButtonMouseClicked(java.awt.event.MouseEvent evt) {
+		Integer port;
+		try {
+			port = mc.createNewPvpGame();
+			new Client(port);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {
-		new Client(network);
+	private void pvcMouseClicked(java.awt.event.MouseEvent evt) {
+		Integer port;
+		try {
+			port = mc.createNewPvcGame();
+			new Client(port);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {
+	private void exitMouseClicked(java.awt.event.MouseEvent evt) {
 		dispose();
 	}
 
