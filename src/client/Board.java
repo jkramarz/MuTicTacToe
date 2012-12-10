@@ -104,9 +104,9 @@ public class Board extends JPanel {
 				while (!end) {
 					JSONObject jsonObject = (JSONObject) JSONSerializer
 							.toJSON(bufferedReader.readLine());
-					switch (jsonObject.getString("status").toUpperCase()) {
+					switch (jsonObject.getString("status").trim().toUpperCase()) {
 					case "TURN":
-						switch (jsonObject.getString("attribute")) {
+						switch (jsonObject.getString("attribute").trim()) {
 						case "YOUR":
 							isMyTurn = true;
 							break;
@@ -116,13 +116,13 @@ public class Board extends JPanel {
 						}
 						break;
 					case "PLACE":
-						Integer x = new Integer(jsonObject.getString("X"));
-						Integer y = new Integer(jsonObject.getString("Y"));
+						Integer x = new Integer(jsonObject.getString("X").trim());
+						Integer y = new Integer(jsonObject.getString("Y").trim());
 						field[getFieldId(x, y)] = cHis;
 						repaint();
 						break;
 					case "WIN":
-						switch (jsonObject.getString("attribute")) {
+						switch (jsonObject.getString("attribute").trim()) {
 						case "YOUR":
 							//TODO
 						case "OPONENT":
@@ -130,7 +130,7 @@ public class Board extends JPanel {
 						}
 						break;
 					case "DISCONNECT":
-						switch (jsonObject.getString("attribute")) {
+						switch (jsonObject.getString("attribute").trim()) {
 						case "SERVER":
 							//TODO
 						case "OPONENT":
