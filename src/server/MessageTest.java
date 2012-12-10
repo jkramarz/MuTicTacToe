@@ -19,7 +19,7 @@ public class MessageTest {
 			assertEquals("ERROR", jsonObject.getString("status").trim());
 			assertEquals(new Integer(i).toString(),
 					jsonObject.getString("error_code").trim());
-			assertEquals((String)Message.getErrorText(i),
+			assertEquals(Message.getErrorText(i),
 					jsonObject.getString("error_message").trim());
 		}
 	}
@@ -31,7 +31,7 @@ public class MessageTest {
 		assertTrue(Message.getErrorText(409) == "przes³any komunikat nieadekwatny do obecnego stanu");
 		assertTrue(Message.getErrorText(404) == "przes³any komunikat niezgodny z protoko³em");
 		assertTrue(Message.getErrorText(403) == "próba po³o¿enia pionka na ju¿ zajetym miejscu");
-		assertTrue(Message.getErrorText(0) == null);
+		assertTrue(Message.getErrorText(0) == "");
 	}
 
 	@Test

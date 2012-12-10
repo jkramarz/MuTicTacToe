@@ -27,7 +27,7 @@ class Message {
 		case 403:
 			return "próba po³o¿enia pionka na ju¿ zajetym miejscu";
 		default:
-			return null;
+			return "";
 		}
 	}
 
