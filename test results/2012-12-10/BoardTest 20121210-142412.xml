@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><testrun name="BoardTest" project="MuTicTacToe" tests="3" started="3" failures="0" errors="0" ignored="0">
+  <testsuite name="client.BoardTest" time="0.111">
+    <testcase name="testPaintGraphics" classname="client.BoardTest" time="0.108"/>
+    <testcase name="testBoard" classname="client.BoardTest" time="0.001"/>
+    <testcase name="testNewGame" classname="client.BoardTest" time="0.002"/>
+  </testsuite>
+</testrun>
