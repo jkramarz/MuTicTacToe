@@ -47,14 +47,14 @@ class Message {
 	public static String getPlayerTurnMessage() {
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "TURN");
-		message.put("attibute", "YOUR");
+		message.put("attribute", "YOUR");
 		return JSONSerializer.toJSON(message).toString();
 	}
 
 	public static String getOponentTurnMessage() {
 		Map<String, String> message = new HashMap<>();
 		message.put("status", "TURN");
-		message.put("attibute", "OPONENT");
+		message.put("attribute", "OPONENT");
 		return JSONSerializer.toJSON(message).toString();
 	}
 
