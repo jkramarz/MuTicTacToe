@@ -22,6 +22,8 @@ public class ServerTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testMain() throws IOException {
+		// TODO
+		fail("Not yet properly implemented");
 
 		Thread t = new Thread(new Main());
 		t.run(); // does not end! ;-(
