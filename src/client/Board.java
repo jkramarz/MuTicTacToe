@@ -39,9 +39,9 @@ public class Board extends JPanel {
 	int[] field; // tablica zawartosci komorki
 	int rows = 10; // ilosc wierszy
 	int cols = 10; // ilosc kolumn
-	int all_cells; // laczna ilosc komorek
-	int left_cells; // komorki niezapelnione
-	boolean isMyTurn; // id gracza wykonujacego ruch (1=local, 0=socket)
+	int all_cells = rows*cols; // laczna ilosc komorek
+	int left_cells = all_cells; // komorki niezapelnione
+	boolean isMyTurn; // id gracza wykonujacego ruch (true=local, false=socket)
 	// private static int ME = 1; private static int HIM = 2;
 
 	JLabel statusbar; // pasek stanu

@@ -8,13 +8,13 @@ public class GomokuTest {
 
 	@Test
 	public void testGomoku() {
-		Gomoku gomoku = new Gomoku(0);
-		assertNotNull("Gomoku can be created", gomoku);
+		Client client = new Client(0);
+		assertNotNull("Gomoku can be created", client);
 	}
 
 	@Test
 	public void testMain() {
-		Gomoku.main(null);
+		Client.main(null);
 	}
 
 }

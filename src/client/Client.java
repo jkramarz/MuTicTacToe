@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class Gomoku extends JFrame {
+public class Client extends JFrame {
 
 	/**
 	 * 
@@ -17,7 +17,7 @@ public class Gomoku extends JFrame {
 
 	private JLabel statusbar;
 
-	public Gomoku(int gameType) {
+	public Client(int gameType) {
 		// parametry okna
 		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
@@ -38,7 +38,12 @@ public class Gomoku extends JFrame {
 
 	public static void main(String[] args) {
 		MainMenu m = new MainMenu();
-		m.initComponents();
+		try {
+			m.initComponents();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// new Gomoku();
 

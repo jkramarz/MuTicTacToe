@@ -1,6 +1,10 @@
 package client;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class MainMenu extends JFrame {
 
@@ -44,8 +48,19 @@ public class MainMenu extends JFrame {
 	private javax.swing.JLabel jLabel1 = new javax.swing.JLabel("MENU G£ÓWNE");
 	private javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
 
-	void initComponents() {
+	void initComponents() throws InterruptedException {
 
+		ManagementConnection mc = new ManagementConnection("localhost", 10001);
+		try {
+			mc.createConnection();
+			mc.execute();
+			JOptionPane.showMessageDialog(null, mc.sendCommand("{\"action\":\"PING\"}"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
 		// napis g³ówny
@@ -159,11 +174,11 @@ public class MainMenu extends JFrame {
 	}
 
 	private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {
-		new Gomoku(local);
+		new Client(local);
 	}
 
 	private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {
-		new Gomoku(network);
+		new Client(network);
 	}
 
 	private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {
