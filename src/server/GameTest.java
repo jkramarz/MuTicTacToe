@@ -15,7 +15,7 @@ public class GameTest {
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10; y++) {
 				assertTrue("Field " + x + "x" + y + " should be blank.",
-						game.fields[x][y] == Game.state.BLANK);
+						game.fields[x][y] == Game.State.BLANK);
 			}
 		}
 		assertTrue("Game with no name should not have name.",

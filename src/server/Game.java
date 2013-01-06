@@ -16,20 +16,20 @@ public class Game extends Thread {
 	ServerSocket socket;
 	String gameName = null;
 	String gameType = null;
-	state[][] fields;
+	State[][] fields;
 
 	@SuppressWarnings("rawtypes")
 	Queue toServer[] = new Queue[2];
 	@SuppressWarnings("rawtypes")
 	Queue toPlayer[] = new Queue[2];
 	ConnectionThread[] player = new ConnectionThread[2];
-	private gamestate gameState;
+	private GameState gameState;
 
-	static enum gamestate {
+	static enum GameState {
 		SIDES, FIRST, FIRSTWON, SECOND, SECONDWON, END, NEW
 	}
 
-	public static enum state {
+	public static enum State {
 		BLANK, FIRST, SECOND
 	}
 
@@ -45,10 +45,10 @@ public class Game extends Thread {
 	public Game(String type, int i) throws IOException {
 		port = i;
 		socket = new ServerSocket(port);
-		fields = new state[10][10];
+		fields = new State[10][10];
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10; y++) {
-				fields[x][y] = state.BLANK;
+				fields[x][y] = State.BLANK;
 			}
 		}
 	}
@@ -63,15 +63,13 @@ public class Game extends Thread {
 
 	void estabilishConnections() throws IOException {
 		for (int i = 0; i < 2; i++) {
-			toPlayer[i] = new ConcurrentLinkedQueue<Message>();
-			toServer[i] = new ConcurrentLinkedQueue<Message>();
 			if (i == 1 && gameType == "PVC") {
-				player[i] = new AIConnectionThread(
-						toPlayer[i], toServer[i]);
+				player[i] = new AIConnectionThread();
 			} else {
-				player[i] = new PlayerConnectionThread(socket.accept(),
-						toPlayer[i], toServer[i]);
+				player[i] = new PlayerConnectionThread(socket.accept());
 			}
+			toPlayer[i] = player[i].getToClient();
+			toServer[i] = player[i].getToServer();
 			player[i].start();
 		}
 	}
@@ -124,7 +122,7 @@ public class Game extends Thread {
 
 	private void newgame() {
 		toPlayer[0].add(Message.getChooseSidesMessage());
-		gameState = gamestate.SIDES;
+		gameState = GameState.SIDES;
 	}
 
 	private void sides() {
@@ -132,10 +130,10 @@ public class Game extends Thread {
 				&& toServer[0].peek() instanceof SidesMessage) {
 			SidesMessage m = (SidesMessage) toServer[0].poll();
 			if (m.getSide() == 0) {
-				gameState = gamestate.FIRST;
+				gameState = GameState.FIRST;
 				toPlayer[0].add(Message.getYourTurnMessage());
 			} else {
-				gameState = gamestate.SECOND;
+				gameState = GameState.SECOND;
 				toPlayer[1].add(Message.getYourTurnMessage());
 			}
 		}else if(!toServer[0].isEmpty()){
@@ -153,15 +151,15 @@ public class Game extends Thread {
 		if (!toServer[i].isEmpty()
 				&& toServer[i].peek() instanceof PlaceMessage) {
 			PlaceMessage m = (PlaceMessage) toServer[i].poll();
-			if (fields[m.getX()][m.getY()] == state.BLANK) {
-				fields[m.getX()][m.getY()] = (i == 0 ? state.FIRST
-						: state.SECOND);
+			if (fields[m.getX()][m.getY()] == State.BLANK) {
+				fields[m.getX()][m.getY()] = (i == 0 ? State.FIRST
+						: State.SECOND);
 				toPlayer[opposite(i)].add(m);
 				if (checkWon(m.getX(), m.getY())) {
-					gameState = (i == 0 ? gamestate.FIRSTWON
-							: gamestate.SECONDWON);
+					gameState = (i == 0 ? GameState.FIRSTWON
+							: GameState.SECONDWON);
 				} else {
-					gameState = (i == 0 ? gamestate.SECOND : gamestate.FIRST);
+					gameState = (i == 0 ? GameState.SECOND : GameState.FIRST);
 					toPlayer[opposite(i)].add(Message.getYourTurnMessage());
 				}
 			} else if (!toServer[0].isEmpty()){
@@ -229,7 +227,7 @@ public class Game extends Thread {
 		System.err.println("W¹tek Game na porcie " + port);
 		try {
 			estabilishConnections();
-			gameState = gamestate.NEW;
+			gameState = GameState.NEW;
 			while (playersConnected()) {
 				if (chatAndDisconnect()) {
 					break;
