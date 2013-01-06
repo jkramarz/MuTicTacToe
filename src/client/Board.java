@@ -4,11 +4,9 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -20,6 +18,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
+import messages.ChatMessage;
+import messages.ChooseSidesMessage;
+import messages.DisconnectMessage;
+import messages.LoseMessage;
+import messages.Message;
+import messages.PlaceMessage;
+import messages.WinMessage;
+import messages.YourTurnMessage;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
@@ -56,8 +62,8 @@ public class Board extends JPanel {
 	JLabel statusbar; // pasek stanu
 
 	Socket socket;
-	volatile BufferedReader bufferedReader;
-	volatile BufferedWriter bufferedWritter;
+	private ObjectInputStream inputStream;
+	private ObjectOutputStream outputStream;
 
 	// ladujemy obrazki do tablicy
 	public Board(JLabel statusbar, String host, int port)
@@ -65,10 +71,9 @@ public class Board extends JPanel {
 		this.statusbar = statusbar;
 
 		socket = new Socket(host, port);
-		bufferedReader = new BufferedReader(new InputStreamReader(
-				socket.getInputStream()));
-		bufferedWritter = new BufferedWriter(new OutputStreamWriter(
-				socket.getOutputStream()));
+		inputStream = new ObjectInputStream(socket.getInputStream());
+		outputStream = new ObjectOutputStream(socket.getOutputStream());
+		
 		JOptionPane.showMessageDialog(null, host + port);
 
 		img = new Image[nImages];
@@ -100,57 +105,30 @@ public class Board extends JPanel {
 
 		@SuppressWarnings("rawtypes")
 		class Worker extends SwingWorker {
-			boolean end = false;
-
 			@Override
 			protected Object doInBackground() throws Exception {
-				while (!end) {
-					JSONObject jsonObject = (JSONObject) JSONSerializer
-							.toJSON(bufferedReader.readLine());
-					switch (jsonObject.getString("status").trim().toUpperCase()) {
-					case "TURN":
-						switch (jsonObject.getString("attribute").trim()) {
-						case "YOUR":
+				while (socket.isConnected()) {
+					Object o = inputStream.readObject();
+					if(o instanceof Message){
+						if(o instanceof YourTurnMessage){
 							isMyTurn = true;
-							break;
-						case "OPONENT":
-							isMyTurn = false;
-							break;
+						}else if(o instanceof ChooseSidesMessage){
+							outputStream.writeObject(Message.getSidesMessage(0));
+						}else if(o instanceof ChatMessage){
+							//TODO
+						}else if(o instanceof PlaceMessage){
+							PlaceMessage m = (PlaceMessage) o;
+							field[getFieldId(m.getX(), m.getY())] = cHis;
+							repaint();
+						}else if(o instanceof WinMessage){
+							//TODO
+						}else if(o instanceof LoseMessage){
+							//TODO
+						}else if(o instanceof DisconnectMessage){
+							//TODO
 						}
-						break;
-					case "PLACE":
-						Integer x = new Integer(jsonObject.getString("X")
-								.trim());
-						Integer y = new Integer(jsonObject.getString("Y")
-								.trim());
-						field[getFieldId(x, y)] = cHis;
-						repaint();
-						break;
-					case "WIN":
-						switch (jsonObject.getString("attribute").trim()) {
-						case "YOUR":
-							// TODO
-						case "OPONENT":
-							// TODO
-						}
-						break;
-					case "DISCONNECT":
-						switch (jsonObject.getString("attribute").trim()) {
-						case "SERVER":
-							// TODO
-						case "OPONENT":
-							// TODO
-						}
-						break;
-					case "CONNECTED":
-						// TODO
-						break;
-					default:
-						throw new Exception();
 					}
-
 				}
-				// TODO Auto-generated method stub
 				return null;
 			}
 
@@ -212,11 +190,9 @@ public class Board extends JPanel {
 					// poloz pionek tylko gdy pole jest puste
 					if (field[field_id] == cBlank) {
 						try {
-							Map<String, String> message = getCoordsFromFieldId(field_id);
-							message.put("action", "PLACE");
-							bufferedWritter.write(JSONSerializer
-									.toJSON(message).toString());
-							bufferedWritter.flush();
+							Map<String, String> fieldId = getCoordsFromFieldId(field_id);
+							PlaceMessage m = Message.getPlaceMessage(fieldId.get("x"), fieldId.get("y"));
+							outputStream.writeObject(m);
 
 							field[field_id] = cMine;
 							left_cells--;

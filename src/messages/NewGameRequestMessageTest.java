@@ -8,13 +8,13 @@ public class NewGameRequestMessageTest {
 
 	@Test
 	public void testNewGameRequestMessage() {
-		NewGameRequestMessage m = new NewGameRequestMessage();
+		NewGameRequestMessage m = new NewGameRequestMessage("PVP");
 		assertEquals("", m.getName());
 	}
 
 	@Test
 	public void testNewGameRequestMessageString() {
-		NewGameRequestMessage m = new NewGameRequestMessage("test");
+		NewGameRequestMessage m = new NewGameRequestMessage("PVC", "test");
 		assertEquals("test", m.getName());
 	}
 

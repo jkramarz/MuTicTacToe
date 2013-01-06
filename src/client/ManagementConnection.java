@@ -1,47 +1,29 @@
 package client;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.concurrent.CountDownLatch;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import messages.Message;
+import messages.NewGameMessage;
 
 public class ManagementConnection {
 
 	private String gamehost;
 	private Integer gameport;
-	private CountDownLatch interupted;
-	static Socket socket;
-	volatile BufferedReader bufferedReader;
-	volatile BufferedWriter bufferedWritter;
-	String command;
-	String result;
+	private Socket socket;
+	private ObjectInputStream inputStream;
+	private ObjectOutputStream outputStream;
 
-
-	ManagementConnection(String host, Integer port) {
+	ManagementConnection(String host, Integer port) throws IOException {
 		gamehost = host;
 		gameport = port;
-	}
-
-	void close() throws Exception {
-		socket.close();
-	}
-
-	void createConnection() throws UnknownHostException, IOException {
 		socket = new Socket(gamehost, gameport);
-		interupted = new CountDownLatch(1);
-		bufferedReader = new BufferedReader(new InputStreamReader(
-				socket.getInputStream()));
-		bufferedWritter = new BufferedWriter(new OutputStreamWriter(
-				socket.getOutputStream()));
+		inputStream = new ObjectInputStream(socket.getInputStream());
+		outputStream = new ObjectOutputStream(socket.getOutputStream());
 	}
-
+	
 	public String getGamehost() {
 		return gamehost;
 	}
@@ -50,52 +32,37 @@ public class ManagementConnection {
 		return gameport;
 	}
 
-	public void interupt() {
-		interupted.countDown();
-	}
-
-	public String sendCommand(String command) {
+	public Message sendCommand(Message command) throws IOException {
+		outputStream.writeObject(command);
+		Object o;
 		try {
-			bufferedWritter.write(command + "\n");
-			bufferedWritter.flush();
-			return bufferedReader.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			o = inputStream.readObject();
+		} catch (ClassNotFoundException e) {
+			return null;
 		}
-		return null;
+		if(o instanceof Message){
+			return (Message) o;
+		}else{
+			return null;
+		}
 	}
 
-	public Integer createNewPvpGame() throws Exception {
-		Integer port = null;
-		String result = sendCommand("{\"action\": \"NEW GAME\", \"type\": \"PVP\"}");
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(result);
-		switch (jsonObject.getString("status").toUpperCase()) {
-		case "OK":
-			if (jsonObject.containsKey("port")) {
-				port = new Integer((String) jsonObject.getString("port"));
-				break;
-			}
-		default:
-			throw new Exception();
+	public int createNewPvpGame() throws Exception {
+		Message result = sendCommand(Message.getNewGameRequestMessage("PVP"));
+		if(result instanceof NewGameMessage){
+			result = (NewGameMessage) result;
+			return ((NewGameMessage) result).getPort();
 		}
-		return port;
+		throw new Exception("Wrong reply");
 	}
 
 	public Integer createNewPvcGame() throws Exception {
-		Integer port = null;
-		String result = sendCommand("{\"action\": \"NEW GAME\", \"type\": \"PVC\"}");
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(result);
-		switch (jsonObject.getString("status").toUpperCase()) {
-		case "OK":
-			if (jsonObject.containsKey("port")) {
-				port = new Integer((String) jsonObject.getString("port"));
-				break;
-			}
-		default:
-			throw new Exception();
+		Message result = sendCommand(Message.getNewGameRequestMessage("PVC"));
+		if(result instanceof NewGameMessage){
+			result = (NewGameMessage) result;
+			return ((NewGameMessage) result).getPort();
 		}
-		return port;
+		throw new Exception("Wrong reply");
 	}
 
 }

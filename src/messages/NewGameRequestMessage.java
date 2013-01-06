@@ -2,13 +2,18 @@ package messages;
 
 public class NewGameRequestMessage extends Message {
 	String name;
-	NewGameRequestMessage(){
-		this("");
+	private String type;
+	NewGameRequestMessage(String type){
+		this(type, "");
 	}
-	NewGameRequestMessage(String n){
+	NewGameRequestMessage(String type, String n){
 		name = n;
+		this.type = type;
 	}
 	public String getName(){
 		return name;
+	}
+	public String getType(){
+		return type;
 	}
 }

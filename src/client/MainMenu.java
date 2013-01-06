@@ -3,6 +3,9 @@ package client;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import messages.Message;
+import messages.PongMessage;
+
 public class MainMenu extends JFrame {
 
 	/**
@@ -55,10 +58,11 @@ public class MainMenu extends JFrame {
 
 		try {
 			ManagementConnection mc = new ManagementConnection(host, 10001);
-			mc.createConnection();
-			mc.sendCommand("{\"action\":\"PING\"}");
-			JOptionPane.showMessageDialog(null, "Connection successfull.");
-			mc.close();
+			if(mc.sendCommand(Message.getPingMessage()) instanceof PongMessage){
+				JOptionPane.showMessageDialog(null, "Connection successfull.");
+			}else{
+				throw new Exception();
+			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Connection failed.");
 		}
@@ -192,9 +196,7 @@ public class MainMenu extends JFrame {
 		Integer port;
 		try {
 			ManagementConnection mc = new ManagementConnection(host, 10001);
-			mc.createConnection();
 			lastport = port = mc.createNewPvpGame();
-			mc.close();
 			new Client(host, port);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -206,9 +208,7 @@ public class MainMenu extends JFrame {
 		Integer port;
 		try {
 			ManagementConnection mc = new ManagementConnection(host, 10001);
-			mc.createConnection();
 			lastport = port = mc.createNewPvcGame();
-			mc.close();
 			new Client(host, port);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

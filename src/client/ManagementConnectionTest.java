@@ -2,12 +2,14 @@ package client;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 public class ManagementConnectionTest {
 
 	@Test
-	public void testGameHostValue() {
+	public void testGameHostValue() throws IOException {
 		String expected_host = "name of the host";
 		Integer expected_port = 6666;
 		ManagementConnection t = new ManagementConnection(expected_host, expected_port);

@@ -37,4 +37,16 @@ public class Message {
 	public static DisconnectMessage getDisconnectMessage() {
 		return new DisconnectMessage();
 	}
+
+	public static Message getNewGameRequestMessage(String string) {
+		return new NewGameRequestMessage(string);
+	}
+
+	public static PlaceMessage getPlaceMessage(String x, String y) {
+		return new PlaceMessage(new Integer(x), new Integer(y));
+	}
+
+	public static SidesMessage getSidesMessage(int i) {
+		return new SidesMessage(i);
+	}
 }
