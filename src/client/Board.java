@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -69,7 +70,17 @@ public class Board extends JPanel {
 
 		socket = new Socket(host, port);
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		inputStream = new ObjectInputStream(socket.getInputStream());
+		inputStream = new ObjectInputStream(new BufferedInputStream(
+				socket.getInputStream()));
+
+		try {
+			outputStream.writeObject(Message.getPingMessage());
+			outputStream.flush();
+			System.err.println(inputStream.readObject().toString());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		JOptionPane.showMessageDialog(null, host + port);
 
