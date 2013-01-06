@@ -9,8 +9,12 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import messages.Message;
+import messages.NewGameRequestMessage;
+
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+
 //import java.util.ArrayList;
 
 /**
@@ -46,7 +50,7 @@ public class Server {
 		 */
 	}
 
-	static String newGame(String name) {
+	static Message newGame(String name) {
 		System.err.println("Szukanie wolnego portu");
 		for (int i = port_start; i <= port_end; i++) {
 			System.err.println("Port " + i);
@@ -57,21 +61,26 @@ public class Server {
 			if (!games.containsKey(i)) {
 				System.err.println(" wolny port, rozpoczynam grê");
 				Game game;
-				if (name != null) {
-					game = new Game(i, name);
-				} else {
-					game = new Game(i);
-				}
-				games.put(i, game);
-				game.start();
+				try {
+					if (name != null) {
 
-				return Message.getNewGameMessage(i);
+						game = new Game(i, name);
+					} else {
+						game = new Game(i);
+					}
+					games.put(i, game);
+					game.start();
+					return Message.getNewGameMessage(i);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		return Message.getErrorMessage(503);
 	}
 
-	static String listGames() {
+	static Message listGames() {
 		/*
 		 * ArrayList<Map<String, String>> gamesList = new ArrayList<>(); for(int
 		 * port : games.keySet()){ if(games.get(port) != null){ Map<String,
@@ -93,8 +102,13 @@ public class Server {
 		});
 	}
 
-	static String pong() {
+	static Message pong() {
 		System.err.println("PING -> PONG");
 		return Message.getPongMessage();
+	}
+
+	static Message newGame(NewGameRequestMessage m) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

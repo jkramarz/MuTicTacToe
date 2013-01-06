@@ -2,18 +2,30 @@ package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import messages.ChatMessage;
+import messages.DisconnectMessage;
+import messages.Message;
+import messages.PlaceMessage;
+import messages.SidesMessage;
 
 public class Game extends Thread {
 	int port;
-	ServerSocket serversocket;
-	ArrayList<Player> players;
+	ServerSocket socket;
 	state turn = state.FIRST;
 	String gameName = null;
 	state[][] fields;
+
+	Queue<Message> toServer[];
+	Queue<Message> toPlayer[];
+	ConnectionThread[] player = new ConnectionThread[2];
+	private gamestate gameState;
+
+	static enum gamestate {
+		SIDES, FIRST, FIRSTWON, SECOND, SECONDWON, END, NEW
+	}
 
 	public static enum state {
 		BLANK, FIRST, SECOND
@@ -22,13 +34,14 @@ public class Game extends Thread {
 	protected Game() {
 	}
 
-	public Game(int i, String n) {
+	public Game(int i, String n) throws IOException {
 		this(i);
 		gameName = n;
 	}
 
-	public Game(int i) {
+	public Game(int i) throws IOException {
 		port = i;
+		socket = new ServerSocket(port);
 		fields = new state[10][10];
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10; y++) {
@@ -41,143 +54,179 @@ public class Game extends Thread {
 		return gameName;
 	}
 
-	public void run() {
-		System.err.println("W¹tek Game na porcie " + port);
-		players = new ArrayList<>();
-		try {
-			serversocket = new ServerSocket(port);
-		} catch (Exception e) {
-			System.err.println("Nie uda³o siê zaj¹c portu " + port);
-			e.printStackTrace();
-		}
-
-		try {
-			for (int i = 0; i < 2; i++) {
-				Player player = new Player(serversocket.accept());
-				System.err.println("Gracz " + i + " po³¹czony.");
-				// TODO
-				if (i == 0 && false) {
-					player.writer.write(Message.getChooseSideMessage());
-					player.writer.flush();
-					String action = ((JSONObject) JSONSerializer
-							.toJSON(player.reader.readLine()))
-							.getString("action");
-					if (action == "ME") {
-						turn = state.FIRST;
-					} else {
-						turn = state.SECOND;
-					}
-				} else if (i == 1) {
-					players.get(0).writer.write(Message.getConnectedMessage());
-					players.get(0).writer.flush();
-				}
-				players.add(player);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			Boolean end_of_game = false;
-			do {
-				sendTurns();
-				end_of_game = !game();
-				turn = getOponent();
-			} while (!end_of_game && players.get(0).isConnected()
-					&& players.get(1).isConnected());
-		} catch (Exception e) {
-			for (int i = 0; i <= 1; i++) {
-				if (!players.get(i).isConnected())
-					continue;
-				try {
-					System.err
-							.println("Problem z kontynuowaniem gry, roz³¹czam graczy");
-					players.get(i).writer.write(Message
-							.getDisconnectedMessage());
-					players.get(i).writer.flush();
-					players.get(i).socket.close();
-				} catch (Exception ex) {
-					System.err.println("Nie uda³o siê roz³¹czyc graczy");
-					return;
-				}
-			}
-			e.printStackTrace();
-		}
-
-		try {
-			serversocket.close();
-		} catch (IOException e) {
-			System.err.println("Nie uda³o siê zamkn¹c socketu.");
+	void estabilishConnections() throws IOException {
+		for (int i = 0; i < 2; i++) {
+			toPlayer[i] = new ConcurrentLinkedQueue<Message>();
+			toServer[i] = new ConcurrentLinkedQueue<Message>();
+			player[i] = new PlayerConnectionThread(socket.accept(),
+					toPlayer[i], toServer[i]);
 		}
 	}
 
-	private Boolean game() throws IOException {
+	boolean playersConnected() {
+		return player[0].isAlive() && player[1].isAlive();
+	}
 
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(players
-				.get(turn == state.FIRST ? 0 : 1).reader.readLine());
-		switch (jsonObject.getString("action").toUpperCase()) {
+	boolean chatAndDisconnect() {
+		for (int i = 0; i < 2; i++) {
+			if (!toServer[i].isEmpty()) {
+				if(toServer[i].peek() instanceof ChatMessage){
+					toPlayer[opposite(i)].add(toServer[i].poll());
+				}else if(toServer[i].peek() instanceof DisconnectMessage){
+					toPlayer[opposite(i)].add(toServer[i].poll());
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-		case "PLACE":
-			int x = jsonObject.getInt("x");
-			int y = jsonObject.getInt("y");
-			if (x < 0 || x >= 10 || y < 0 || y >= 10) {
-				players.get(getPlayerIndex(getOponent())).writer.write(Message
-						.getErrorMessage(404));
-				players.get(getPlayerIndex(getOponent())).writer.flush();
-				game();
+	boolean stateMachine() {
+		switch (gameState) {
+		case NEW:
+			newgame();
+			break;
+		case SIDES:
+			sides();
+			break;
+		case FIRST:
+			turn(0);
+			break;
+		case FIRSTWON:
+			winlose(0);
+			break;
+		case SECOND:
+			turn(1);
+			break;
+		case SECONDWON:
+			winlose(1);
+			break;
+		case END:
+			return true;
+		default:
+			break;
+		}
+		return false;
+	}
+
+	private void newgame() {
+		toPlayer[0].add(Message.getChooseSidesMessage());
+		gameState = gamestate.SIDES;
+	}
+
+	private void sides() {
+		if (!toServer[0].isEmpty()
+				&& toServer[0].peek() instanceof SidesMessage) {
+			SidesMessage m = (SidesMessage) toServer[0].poll();
+			if (m.getSide() == 0) {
+				gameState = gamestate.FIRST;
+				toPlayer[0].add(Message.getYourTurnMessage());
+			} else {
+				gameState = gamestate.SECOND;
+				toPlayer[1].add(Message.getYourTurnMessage());
 			}
-			if (fields[x][y] != state.BLANK) {
-				players.get(getPlayerIndex(getOponent())).writer.write(Message
-						.getErrorMessage(409));
-				players.get(getPlayerIndex(getOponent())).writer.flush();
-				game();
+		}
+	}
+
+	private void winlose(int i) {
+		toPlayer[i].add(Message.getWinMessage());
+		toPlayer[opposite(i)].add(Message.getLoseMessage());
+	}
+
+	private void turn(int i) {
+		if (!toServer[i].isEmpty()
+				&& toServer[i].peek() instanceof PlaceMessage) {
+			PlaceMessage m = (PlaceMessage) toServer[i].poll();
+			if (fields[m.getX()][m.getY()] == state.BLANK) {
+				fields[m.getX()][m.getY()] = (i == 0 ? state.FIRST
+						: state.SECOND);
+				toPlayer[opposite(i)].add(m);
+				if (checkWon(m.getX(), m.getY())) {
+					gameState = (i == 0 ? gamestate.FIRSTWON
+							: gamestate.SECONDWON);
+				} else {
+					gameState = (i == 0 ? gamestate.SECOND : gamestate.FIRST);
+					toPlayer[opposite(i)].add(Message.getYourTurnMessage());
+				}
+			} else {
+				toPlayer[i].add(Message.getErrorMessage(403));
 			}
-			fields[x][y] = turn;
-			players.get(getPlayerIndex(getOponent())).writer.write(Message
-					.getOponentPlaceMessage(x, y));
+		}
+	}
+
+	boolean checkWon(int x, int y) {
+		int count;
+
+		// in column
+		count = 1;
+		for (int i = x + 1; i < 10 && fields[i][y] == fields[x][y]; i++, count++)
+			;
+		for (int i = x - 1; i >= 0 && fields[i][y] == fields[x][y]; i--, count++)
+			;
+		if (count >= 5)
 			return true;
 
-		case "DISCONNECT":
-			players.get(getPlayerIndex(turn)).socket.close();
-			players.get(getPlayerIndex(getOponent())).writer.write(Message
-					.getDisconnectedMessage());
-			players.get(getPlayerIndex(getOponent())).writer.flush();
-			players.get(getPlayerIndex(getOponent())).socket.close();
-			return false;
+		// in row
+		count = 1;
+		for (int i = y + 1; i < 10 && fields[x][i] == fields[x][y]; i++, count++)
+			;
+		for (int i = y - 1; i >= 0 && fields[x][i] == fields[x][y]; i--, count++)
+			;
+		if (count >= 5)
+			return true;
 
-		case "CHAT":
-		default:
-			players.get(getPlayerIndex(turn)).writer.write(Message
-					.getErrorMessage(401));
-			players.get(getPlayerIndex(turn)).writer.flush();
-			game();
-		}
-		return true;
+		// in NE-SW
+		count = 1;
+		for (int i = 1; (x + i) < 10 && (y + i) < 10
+				&& fields[x + i][y + i] == fields[x][y]; i++, count++)
+			;
+		for (int i = 1; (x - i) >= 0 && (y - i) >= 0
+				&& fields[x - i][y - i] == fields[x][y]; i++, count++)
+			;
+		if (count >= 5)
+			return true;
 
+		// in NW-SE
+		count = 1;
+		for (int i = 1; (x + i) < 10 && (y - i) >= 0
+				&& fields[x + i][y + i] == fields[x][y]; i++, count++)
+			;
+		for (int i = 1; (x - i) >= 0 && (y + i) < 10
+				&& fields[x - i][y - i] == fields[x][y]; i++, count++)
+			;
+		if (count >= 5)
+			return true;
+
+		return false;
 	}
 
-	private void sendTurns() {
+	void disconnect() {
+		for (int i = 0; i < 2; i++) {
+			player[i].disconnect();
+		}
+	}
+
+	public void run() {
+		System.err.println("W¹tek Game na porcie " + port);
 		try {
-			players.get(getPlayerIndex(turn)).writer.write(Message
-					.getPlayerTurnMessage());
-			players.get(getPlayerIndex(turn)).writer.flush();
-			players.get(getPlayerIndex(getOponent())).writer.write(Message
-					.getOponentTurnMessage());
-			players.get(getPlayerIndex(getOponent())).writer.flush();
-		} catch (IOException e) {
-			System.err.println("Nie mo¿na wys³ac tur.");
+			estabilishConnections();
+			while (playersConnected()) {
+				if (chatAndDisconnect()) {
+					break;
+				}
+				if (stateMachine()) {
+					break;
+				}
+			}
+		} catch (Exception e) {
+		} finally {
+			disconnect();
 		}
 	}
 
-	private state getOponent() {
-		if (turn == state.FIRST)
-			return state.SECOND;
-		return state.FIRST;
-	}
-
-	private int getPlayerIndex(state t) {
-		if (t == state.FIRST)
-			return 0;
-		return 1;
+	private int opposite(int i) {
+		if (i == 0)
+			return 1;
+		return 0;
 	}
 }

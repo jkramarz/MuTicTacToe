@@ -1,37 +1,36 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import messages.ListGamesRequestMessage;
+import messages.Message;
+import messages.NewGameRequestMessage;
+import messages.PingMessage;
 
 class Connection implements Runnable {
 
 	Socket socket;
-
-	Connection(Socket s) {
+	ObjectInputStream inputStream;
+	ObjectOutputStream outputStream;
+	Connection(Socket s) throws IOException {
 		socket = s;
+		inputStream = new ObjectInputStream(socket.getInputStream());
+		outputStream = new ObjectOutputStream(socket.getOutputStream());
 	}
 
 	@Override
 	public void run() {
 		try {
-			BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(socket.getInputStream()));
-			BufferedWriter bufferedWritter = new BufferedWriter(
-					new OutputStreamWriter(socket.getOutputStream()));
 			while (!socket.isClosed()) {
-				String command = bufferedReader.readLine();
-				System.err.println(command);
-				String result = routeCommand(command);
-				System.err.println(result);
-				bufferedWritter.write(result + "\n");
-				bufferedWritter.flush();
+				if(inputStream.available() > 0){
+					Object o = inputStream.readObject();
+					if(o instanceof Message){
+						outputStream.writeObject(routeCommand((Message) o));
+					}
+				}
 			}
 			socket.close();
 		} catch (Exception e) {
@@ -42,20 +41,14 @@ class Connection implements Runnable {
 		}
 	}
 
-	private static String routeCommand(String command) {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(command);
-		switch (jsonObject.getString("action").toUpperCase()) {
-		case "NEW GAME":
-			if (jsonObject.containsKey("name")) {
-				return Server.newGame(jsonObject.getString("name"));
-			} else {
-				return Server.newGame(null);
-			}
-		case "LIST GAMES":
+	private Message routeCommand(Message m) {
+		if(m instanceof NewGameRequestMessage){
+			return Server.newGame((NewGameRequestMessage) m);
+		}else if(m instanceof ListGamesRequestMessage){
 			return Server.listGames();
-		case "PING":
-			return Server.pong();
-		default:
+		}else if(m instanceof PingMessage){
+			return Message.getPongMessage();
+		}else{
 			return Message.getErrorMessage(404);
 		}
 	}
