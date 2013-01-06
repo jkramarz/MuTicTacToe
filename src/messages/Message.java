@@ -3,12 +3,13 @@ package messages;
 import java.io.Serializable;
 
 public class Message implements Serializable{
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -161015076099664818L;
 
+	protected Message(){}
+	
 	public static ErrorMessage getErrorMessage(Integer i) {
 		return new ErrorMessage(i);
 	}
