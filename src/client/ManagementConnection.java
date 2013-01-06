@@ -1,5 +1,6 @@
 package client;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,7 +22,7 @@ public class ManagementConnection {
 		gameport = port;
 		socket = new Socket(gamehost, gameport);
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		inputStream = new ObjectInputStream(socket.getInputStream());
+		inputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 		
 	}
 	
