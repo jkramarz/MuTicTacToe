@@ -3,15 +3,15 @@
  */
 package server;
 
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
-import java.io.*;
-import java.net.*;
-//import java.util.ArrayList;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.json.*;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
+//import java.util.ArrayList;
 
 /**
  * @author lenwe
@@ -36,24 +36,8 @@ public class Server {
 		serversocket = new ServerSocket(port);
 		while (!interupted) {
 			Socket socket = serversocket.accept();
-			try {
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(socket.getInputStream()));
-				BufferedWriter bufferedWritter = new BufferedWriter(
-						new OutputStreamWriter(socket.getOutputStream()));
-				while (!socket.isClosed() && !interupted) {
-					String command = bufferedReader.readLine();
-					System.err.println(command);
-					String result = routeCommand(command);
-					System.err.println(result);
-					bufferedWritter.write(result + "\n");
-					bufferedWritter.flush();
-				}
-				socket.close();
-			} catch (Exception e) {
-				socket.close();
-				System.err.println(e.getMessage());
-			}
+			Thread t = new Thread(new Connection(socket));
+			t.start();
 		}
 		serversocket.close();
 
@@ -62,39 +46,7 @@ public class Server {
 		 */
 	}
 
-	private static String routeCommand(String command) {
-		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(command);
-		switch (jsonObject.getString("action").toUpperCase()) {
-		case "NEW GAME":
-			if (jsonObject.containsKey("name")) {
-				return newGame(jsonObject.getString("name"));
-			} else {
-				return newGame(null);
-			}
-		case "LIST GAMES":
-			return listGames();
-		case "PING":
-			return pong();
-		default:
-			return Message.getErrorMessage(404);
-		}
-	}
-
-	private static String listGames() {
-		/*
-		 * ArrayList<Map<String, String>> gamesList = new ArrayList<>(); for(int
-		 * port : games.keySet()){ if(games.get(port) != null){ Map<String,
-		 * String> game = new HashMap<>(); game.put("port", new
-		 * Integer(port).toString()); game.put("name",
-		 * games.get(port).getGameName()); gamesList.add(game); } } Map<String,
-		 * Object> message = new HashMap<>(); message.add("status", "OK");
-		 * message.add("games", gamesList);
-		 */
-
-		return Message.getErrorMessage(401);
-	}
-
-	private static String newGame(String name) {
+	static String newGame(String name) {
 		System.err.println("Szukanie wolnego portu");
 		for (int i = port_start; i <= port_end; i++) {
 			System.err.println("Port " + i);
@@ -119,9 +71,18 @@ public class Server {
 		return Message.getErrorMessage(503);
 	}
 
-	private static String pong() {
-		System.err.println("PING -> PONG");
-		return Message.getPongMessage();
+	static String listGames() {
+		/*
+		 * ArrayList<Map<String, String>> gamesList = new ArrayList<>(); for(int
+		 * port : games.keySet()){ if(games.get(port) != null){ Map<String,
+		 * String> game = new HashMap<>(); game.put("port", new
+		 * Integer(port).toString()); game.put("name",
+		 * games.get(port).getGameName()); gamesList.add(game); } } Map<String,
+		 * Object> message = new HashMap<>(); message.add("status", "OK");
+		 * message.add("games", gamesList);
+		 */
+
+		return Message.getErrorMessage(401);
 	}
 
 	private static void setupSignalHandler() {
@@ -132,4 +93,8 @@ public class Server {
 		});
 	}
 
+	static String pong() {
+		System.err.println("PING -> PONG");
+		return Message.getPongMessage();
+	}
 }

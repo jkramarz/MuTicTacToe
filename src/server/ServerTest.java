@@ -21,12 +21,10 @@ public class ServerTest {
 
 	@SuppressWarnings("deprecation")
 	@Test
-	public void testMain() throws IOException {
-		// TODO
-		fail("Not yet properly implemented");
-
+	public void testMain() throws IOException, InterruptedException {
 		Thread t = new Thread(new Main());
-		t.run(); // does not end! ;-(
+		t.start();
+		Thread.sleep(3);
 		assertTrue("Server is bound to port", Server.serversocket.isBound());
 		assertTrue("Server is bound to specified port",
 				Server.serversocket.getLocalPort() == Server.port);
