@@ -73,6 +73,19 @@ public class Server {
 				interupted = true;
 			}
 		});
+		
+		Signal.handle(new Signal("TERM"), new SignalHandler() {
+			public void handle(Signal sig) {
+				try
+                {
+                    serversocket.close();
+                }
+                catch(IOException e)
+                {
+                    System.err.println("Nie uda³o siê odbindowaæ, smutne.");
+                }
+			}
+		});
 	}
 
 	static Message pong() {
