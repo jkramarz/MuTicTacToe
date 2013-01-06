@@ -7,6 +7,7 @@ import java.util.Queue;
 import messages.ChatMessage;
 import messages.DisconnectMessage;
 import messages.Message;
+import messages.PingMessage;
 import messages.PlaceMessage;
 import messages.SidesMessage;
 
@@ -93,6 +94,8 @@ public class Game extends Thread {
 					player.opponent().toClient()
 							.add(player.toServer().poll());
 					return true;
+				} else if (player.toServer().peek() instanceof PingMessage) {
+					player.toClient().add(Message.getPongMessage());
 				}
 			}
 		}

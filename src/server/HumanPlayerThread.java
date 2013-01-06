@@ -13,12 +13,12 @@ class HumanPlayerThread extends PlayerThread {
 
 	Queue<Message> toClient;
 	Queue<Message> toServer;
-	Socket playerConnection;
+	Socket socket;
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
 
 	HumanPlayerThread(Marker marker, Socket playerConnection) throws IOException {
-		this.playerConnection = playerConnection;
+		this.socket = playerConnection;
 		this.toClient = new ConcurrentLinkedQueue<Message>();
 		this.toServer = new ConcurrentLinkedQueue<Message>();
 		this.marker = marker;
@@ -37,7 +37,7 @@ class HumanPlayerThread extends PlayerThread {
 
 	public void run() {
 		try {
-			while (playerConnection.isConnected()) {
+			while (socket.isConnected()) {
 				if (!toClient.isEmpty()) {
 					System.err.println("=>" + toClient.peek().toString());
 					outputStream.writeObject(toClient.poll());
@@ -53,15 +53,16 @@ class HumanPlayerThread extends PlayerThread {
 			}
 			toServer.add(Message.getDisconnectMessage());
 		} catch (Exception e) {
-			return;
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void disconnect() {
 		try {
-			playerConnection.close();
+			socket.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
