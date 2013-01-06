@@ -14,6 +14,7 @@ public class NewGameMessageTest {
 
 	@Test
 	public void testGetPort() {
+		m = new NewGameMessage(100);
 		assertTrue(100 == m.getPort());
 	}
 

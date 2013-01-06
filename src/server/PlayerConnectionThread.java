@@ -17,20 +17,21 @@ class PlayerConnectionThread extends ConnectionThread {
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
 
-	PlayerConnectionThread(Socket playerConnection) throws IOException {
+	PlayerConnectionThread(Marker marker, Socket playerConnection) throws IOException {
 		this.playerConnection = playerConnection;
 		this.toClient = new ConcurrentLinkedQueue<Message>();
 		this.toServer = new ConcurrentLinkedQueue<Message>();
+		this.marker = marker;
 		inputStream = new ObjectInputStream(playerConnection.getInputStream());
 		outputStream = new ObjectOutputStream(
 				playerConnection.getOutputStream());
 	}
 	
-	Queue<Message> getToClient(){
+	Queue<Message> toClient(){
 		return toClient;
 	}
 	
-	Queue<Message> getToServer(){
+	Queue<Message> toServer(){
 		return toServer;
 	}
 

@@ -12,16 +12,17 @@ class AIConnectionThread extends ConnectionThread {
 	Queue<Message> toClient;
 	Queue<Message> toServer;
 
-	AIConnectionThread() throws IOException {
+	AIConnectionThread(Marker marker) throws IOException {
 		this.toClient = new ConcurrentLinkedQueue<Message>();
 		this.toServer = new ConcurrentLinkedQueue<Message>();
+		this.marker = marker;
 	}
 
-	Queue<Message> getToClient() {
+	Queue<Message> toClient() {
 		return toClient;
 	}
 
-	Queue<Message> getToServer() {
+	Queue<Message> toServer() {
 		return toServer;
 	}
 

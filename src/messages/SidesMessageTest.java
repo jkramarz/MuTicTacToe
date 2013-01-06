@@ -13,6 +13,7 @@ public class SidesMessageTest {
 
 	@Test
 	public void testGetSide() {
+		m = new SidesMessage(1);
 		assertTrue(m.getSide() == 1);
 	}
 

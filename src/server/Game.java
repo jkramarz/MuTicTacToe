@@ -3,7 +3,6 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import messages.ChatMessage;
 import messages.DisconnectMessage;
@@ -16,7 +15,7 @@ public class Game extends Thread {
 	ServerSocket socket;
 	String gameName = null;
 	String gameType = null;
-	State[][] fields;
+	Marker[][] fields;
 
 	@SuppressWarnings("rawtypes")
 	Queue toServer[] = new Queue[2];
@@ -27,10 +26,6 @@ public class Game extends Thread {
 
 	static enum GameState {
 		SIDES, FIRST, FIRSTWON, SECOND, SECONDWON, END, NEW
-	}
-
-	public static enum State {
-		BLANK, FIRST, SECOND
 	}
 
 	protected Game() {
@@ -45,10 +40,10 @@ public class Game extends Thread {
 	public Game(String type, int i) throws IOException {
 		port = i;
 		socket = new ServerSocket(port);
-		fields = new State[10][10];
+		fields = new Marker[10][10];
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10; y++) {
-				fields[x][y] = State.BLANK;
+				fields[x][y] = Marker.BLANK;
 			}
 		}
 	}
@@ -64,14 +59,18 @@ public class Game extends Thread {
 	void estabilishConnections() throws IOException {
 		for (int i = 0; i < 2; i++) {
 			if (i == 1 && gameType == "PVC") {
-				player[i] = new AIConnectionThread();
+				player[i] = new AIConnectionThread(i == 0 ? Marker.FIRST
+						: Marker.SECOND);
 			} else {
-				player[i] = new PlayerConnectionThread(socket.accept());
+				player[i] = new PlayerConnectionThread(i == 0 ? Marker.FIRST
+						: Marker.SECOND, socket.accept());
 			}
-			toPlayer[i] = player[i].getToClient();
-			toServer[i] = player[i].getToServer();
+			toPlayer[i] = player[i].toClient();
+			toServer[i] = player[i].toServer();
 			player[i].start();
 		}
+		player[0].setOpponent(player[1]);
+		player[1].setOpponent(player[0]);
 	}
 
 	boolean playersConnected() {
@@ -82,9 +81,11 @@ public class Game extends Thread {
 		for (int i = 0; i < 2; i++) {
 			if (!toServer[i].isEmpty()) {
 				if (toServer[i].peek() instanceof ChatMessage) {
-					toPlayer[opposite(i)].add(toServer[i].poll());
+					player[i].opponent().toClient()
+							.add(player[i].toServer().poll());
 				} else if (toServer[i].peek() instanceof DisconnectMessage) {
-					toPlayer[opposite(i)].add(toServer[i].poll());
+					player[i].opponent().toClient()
+							.add(player[i].toServer().poll());
 					return true;
 				}
 			}
@@ -101,13 +102,13 @@ public class Game extends Thread {
 			sides();
 			break;
 		case FIRST:
-			turn(0);
+			turn(player[0]);
 			break;
 		case FIRSTWON:
 			winlose(0);
 			break;
 		case SECOND:
-			turn(1);
+			turn(player[0].opponent());
 			break;
 		case SECONDWON:
 			winlose(1);
@@ -121,7 +122,7 @@ public class Game extends Thread {
 	}
 
 	private void newgame() {
-		toPlayer[0].add(Message.getChooseSidesMessage());
+		player[0].toClient().add(Message.getChooseSidesMessage());
 		gameState = GameState.SIDES;
 	}
 
@@ -129,45 +130,45 @@ public class Game extends Thread {
 		if (!toServer[0].isEmpty()
 				&& toServer[0].peek() instanceof SidesMessage) {
 			SidesMessage m = (SidesMessage) toServer[0].poll();
-			if (m.getSide() == 0) {
-				gameState = GameState.FIRST;
-				toPlayer[0].add(Message.getYourTurnMessage());
-			} else {
-				gameState = GameState.SECOND;
-				toPlayer[1].add(Message.getYourTurnMessage());
+			if (m.getSide() == 0 || m.getSide() == 1) {
+				gameState = m.getSide() == 0 ? GameState.FIRST
+						: GameState.SECOND;
+				player[m.getSide()].toClient()
+						.add(Message.getYourTurnMessage());
 			}
-		}else if(!toServer[0].isEmpty()){
-			toServer[0].remove();
-			toPlayer[0].add(Message.getErrorMessage(409));
+		} else if (!toServer[0].isEmpty()) {
+			player[0].toServer().remove();
+			player[0].toClient().add(Message.getErrorMessage(409));
 		}
 	}
 
 	private void winlose(int i) {
-		toPlayer[i].add(Message.getWinMessage());
-		toPlayer[opposite(i)].add(Message.getLoseMessage());
+		player[0].toClient().add(Message.getWinMessage());
+		player[0].opponent().toClient().add(Message.getLoseMessage());
 	}
 
-	private void turn(int i) {
-		if (!toServer[i].isEmpty()
-				&& toServer[i].peek() instanceof PlaceMessage) {
-			PlaceMessage m = (PlaceMessage) toServer[i].poll();
-			if (fields[m.getX()][m.getY()] == State.BLANK) {
-				fields[m.getX()][m.getY()] = (i == 0 ? State.FIRST
-						: State.SECOND);
-				toPlayer[opposite(i)].add(m);
+	private void turn(ConnectionThread player) {
+		if (player.toServer().isEmpty()
+				&& player.toServer().peek() instanceof PlaceMessage) {
+			PlaceMessage m = (PlaceMessage) player.toServer().poll();
+			if (fields[m.getX()][m.getY()] == Marker.BLANK) {
+				fields[m.getX()][m.getY()] = player.marker();
+				player.opponent().toClient().add(m);
 				if (checkWon(m.getX(), m.getY())) {
-					gameState = (i == 0 ? GameState.FIRSTWON
+					gameState = (gameState == GameState.FIRST ? GameState.FIRSTWON
 							: GameState.SECONDWON);
 				} else {
-					gameState = (i == 0 ? GameState.SECOND : GameState.FIRST);
-					toPlayer[opposite(i)].add(Message.getYourTurnMessage());
+					gameState = (gameState == GameState.FIRST ? GameState.SECOND
+							: GameState.FIRST);
+					player.opponent().toClient()
+							.add(Message.getYourTurnMessage());
 				}
-			} else if (!toServer[0].isEmpty()){
-				toPlayer[i].add(Message.getErrorMessage(403));
+			} else if (!toServer[0].isEmpty()) {
+				player.toClient().add(Message.getErrorMessage(403));
 			}
-		}else{
-			toServer[i].remove();
-			toPlayer[i].add(Message.getErrorMessage(409));
+		} else {
+			player.toServer().remove();
+			player.toClient().add(Message.getErrorMessage(409));
 		}
 	}
 
@@ -244,9 +245,4 @@ public class Game extends Thread {
 		}
 	}
 
-	private int opposite(int i) {
-		if (i == 0)
-			return 1;
-		return 0;
-	}
 }
