@@ -22,6 +22,7 @@ public class MainMenu extends JFrame {
 
 	// TODO
 	String host = "localhost";
+	private ManagementConnection mc;
 
 	public MainMenu() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,9 +58,9 @@ public class MainMenu extends JFrame {
 	void initComponents() throws InterruptedException {
 
 		try {
-			ManagementConnection mc = new ManagementConnection(host, 10001);
+			mc = new ManagementConnection(host, 10001);
 			if(mc.sendCommand(Message.getPingMessage()) instanceof PongMessage){
-				JOptionPane.showMessageDialog(null, "Connection successfull.");
+				//JOptionPane.showMessageDialog(null, "Connection successfull.");
 			}else{
 				throw new Exception();
 			}
@@ -195,7 +196,6 @@ public class MainMenu extends JFrame {
 	private void pvpButtonMouseClicked(java.awt.event.MouseEvent evt) {
 		Integer port;
 		try {
-			ManagementConnection mc = new ManagementConnection(host, 10001);
 			lastport = port = mc.createNewPvpGame();
 			new Client(host, port);
 		} catch (Exception e) {
@@ -207,7 +207,6 @@ public class MainMenu extends JFrame {
 	private void pvcMouseClicked(java.awt.event.MouseEvent evt) {
 		Integer port;
 		try {
-			ManagementConnection mc = new ManagementConnection(host, 10001);
 			lastport = port = mc.createNewPvcGame();
 			new Client(host, port);
 		} catch (Exception e) {

@@ -16,7 +16,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 
 import messages.ChatMessage;
 import messages.ChooseSidesMessage;
@@ -69,9 +68,9 @@ public class Board extends JPanel {
 		this.statusbar = statusbar;
 
 		socket = new Socket(host, port);
-		inputStream = new ObjectInputStream(socket.getInputStream());
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		
+		inputStream = new ObjectInputStream(socket.getInputStream());
+
 		JOptionPane.showMessageDialog(null, host + port);
 
 		img = new Image[nImages];
@@ -101,39 +100,52 @@ public class Board extends JPanel {
 		// pasek stanu
 		statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
 
-		@SuppressWarnings("rawtypes")
-		class Worker extends SwingWorker {
+		class Worker extends Thread {
 			@Override
-			protected Object doInBackground() throws Exception {
+			public void run() {
 				while (socket.isConnected()) {
-					Object o = inputStream.readObject();
-					if(o instanceof Message){
-						if(o instanceof YourTurnMessage){
-							isMyTurn = true;
-						}else if(o instanceof ChooseSidesMessage){
-							outputStream.writeObject(Message.getSidesMessage(0));
-						}else if(o instanceof ChatMessage){
-							//TODO
-						}else if(o instanceof PlaceMessage){
-							PlaceMessage m = (PlaceMessage) o;
-							field[getFieldId(m.getX(), m.getY())] = cHis;
-							repaint();
-						}else if(o instanceof WinMessage){
-							//TODO
-						}else if(o instanceof LoseMessage){
-							//TODO
-						}else if(o instanceof DisconnectMessage){
-							//TODO
+					try {
+						if (inputStream.available() > 0) {
+							Object o = inputStream.readObject();
+							System.err.println("<=" + o.toString());
+							if (o instanceof Message) {
+								if (o instanceof YourTurnMessage) {
+									isMyTurn = true;
+								} else if (o instanceof ChooseSidesMessage) {
+									outputStream.writeObject(Message
+											.getSidesMessage(0));
+								} else if (o instanceof ChatMessage) {
+									// TODO
+								} else if (o instanceof PlaceMessage) {
+									PlaceMessage m = (PlaceMessage) o;
+									field[getFieldId(m.getX(), m.getY())] = cHis;
+									repaint();
+								} else if (o instanceof WinMessage) {
+									// TODO
+								} else if (o instanceof LoseMessage) {
+									// TODO
+								} else if (o instanceof DisconnectMessage) {
+									// TODO
+								} else {
+
+								}
+							}
+						} else {
+							Thread.sleep(50);
 						}
+					} catch (ClassNotFoundException | IOException
+							| InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
-				return null;
+				return;
 			}
 
 		}
 
 		Worker worker = new Worker();
-		worker.execute();
+		worker.start();
 
 	}
 
@@ -165,8 +177,9 @@ public class Board extends JPanel {
 		public void mousePressed(MouseEvent e) {
 
 			// nie rob nic jezeli ruch nalezy do przeciwnika
-			if (!isMyTurn)
-				return;
+			/*
+			 * if (!isMyTurn) return;
+			 */
 
 			// zamiana wspolrzednych na konkretne pole
 			int x = e.getX();
@@ -189,7 +202,9 @@ public class Board extends JPanel {
 					if (field[field_id] == cBlank) {
 						try {
 							Map<String, String> fieldId = getCoordsFromFieldId(field_id);
-							PlaceMessage m = Message.getPlaceMessage(fieldId.get("x"), fieldId.get("y"));
+							PlaceMessage m = Message.getPlaceMessage(
+									fieldId.get("x"), fieldId.get("y"));
+							System.err.println("=>" + m.toString());
 							outputStream.writeObject(m);
 
 							field[field_id] = cMine;

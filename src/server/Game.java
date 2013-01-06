@@ -14,13 +14,14 @@ import messages.SidesMessage;
 public class Game extends Thread {
 	int port;
 	ServerSocket socket;
-	state turn = state.FIRST;
 	String gameName = null;
 	String gameType = null;
 	state[][] fields;
 
-	Queue<Message> toServer[];
-	Queue<Message> toPlayer[];
+	@SuppressWarnings("rawtypes")
+	Queue toServer[] = new Queue[2];
+	@SuppressWarnings("rawtypes")
+	Queue toPlayer[] = new Queue[2];
 	ConnectionThread[] player = new ConnectionThread[2];
 	private gamestate gameState;
 
@@ -137,6 +138,9 @@ public class Game extends Thread {
 				gameState = gamestate.SECOND;
 				toPlayer[1].add(Message.getYourTurnMessage());
 			}
+		}else if(!toServer[0].isEmpty()){
+			toServer[0].remove();
+			toPlayer[0].add(Message.getErrorMessage(409));
 		}
 	}
 
@@ -160,9 +164,12 @@ public class Game extends Thread {
 					gameState = (i == 0 ? gamestate.SECOND : gamestate.FIRST);
 					toPlayer[opposite(i)].add(Message.getYourTurnMessage());
 				}
-			} else {
+			} else if (!toServer[0].isEmpty()){
 				toPlayer[i].add(Message.getErrorMessage(403));
 			}
+		}else{
+			toServer[i].remove();
+			toPlayer[i].add(Message.getErrorMessage(409));
 		}
 	}
 
@@ -222,6 +229,7 @@ public class Game extends Thread {
 		System.err.println("W¹tek Game na porcie " + port);
 		try {
 			estabilishConnections();
+			gameState = gamestate.NEW;
 			while (playersConnected()) {
 				if (chatAndDisconnect()) {
 					break;
@@ -229,8 +237,10 @@ public class Game extends Thread {
 				if (stateMachine()) {
 					break;
 				}
+				Thread.sleep(50);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			disconnect();
 		}

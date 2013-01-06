@@ -38,8 +38,9 @@ public class ManagementConnection {
 		Object o;
 		try {
 			o = inputStream.readObject();
+			System.err.println(o.toString());
 		} catch (ClassNotFoundException e) {
-			System.err.println("Wrong class in reply!");
+			e.printStackTrace();
 			return null;
 		}
 		if(o instanceof Message){

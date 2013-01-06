@@ -28,14 +28,17 @@ class PlayerConnectionThread extends ConnectionThread {
 		try {
 			while (playerConnection.isConnected()) {
 				if (!fromServer.isEmpty()) {
+					System.err.println("=>" + fromServer.peek().toString());
 					outputStream.writeObject(fromServer.poll());
 				}
-				if (inputStream.available() != 0) {
+				if (inputStream.available() > 0) {
 					Object o = inputStream.readObject();
+					System.err.println("<=" + o.toString());
 					if (o instanceof Message) {
 						toServer.add((Message) o);
 					}
 				}
+				Thread.sleep(50);
 			}
 			toServer.add(Message.getDisconnectMessage());
 		} catch (Exception e) {
