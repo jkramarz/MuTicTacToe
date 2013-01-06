@@ -41,7 +41,7 @@ public class Server {
 		while (!interupted) {
 			try {
 				Socket socket = serversocket.accept();
-				Thread t = new Thread(new Connection(socket));
+				Thread t = new Thread(new ManagementConnection(socket));
 				t.start();
 			} catch (Exception e) {
 			}

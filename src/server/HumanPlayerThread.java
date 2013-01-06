@@ -41,6 +41,7 @@ class HumanPlayerThread extends PlayerThread {
 				if (!toClient.isEmpty()) {
 					System.err.println("=>" + toClient.peek().toString());
 					outputStream.writeObject(toClient.poll());
+					outputStream.flush();
 				} else if (inputStream.available() > 0) {
 					Object o = inputStream.readObject();
 					System.err.println("<=" + o.toString());

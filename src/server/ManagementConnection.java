@@ -10,13 +10,13 @@ import messages.Message;
 import messages.NewGameRequestMessage;
 import messages.PingMessage;
 
-class Connection implements Runnable {
+class ManagementConnection implements Runnable {
 
 	Socket socket;
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
 
-	Connection(Socket s) throws IOException {
+	ManagementConnection(Socket s) throws IOException {
 		socket = s;
 		inputStream = new ObjectInputStream(socket.getInputStream());
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
