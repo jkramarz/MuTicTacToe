@@ -1,6 +1,10 @@
 package messages;
 
 public class NewGameRequestMessage extends Message {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5550178127013249052L;
 	String name;
 	private String type;
 	NewGameRequestMessage(String type){

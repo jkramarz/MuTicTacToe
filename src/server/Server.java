@@ -39,9 +39,11 @@ public class Server {
 		// try{
 		serversocket = new ServerSocket(port);
 		while (!interupted) {
+			try{
 			Socket socket = serversocket.accept();
 			Thread t = new Thread(new Connection(socket));
 			t.start();
+			}catch(Exception e){}
 		}
 		serversocket.close();
 

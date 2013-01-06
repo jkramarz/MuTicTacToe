@@ -1,6 +1,13 @@
 package messages;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -161015076099664818L;
 
 	public static ErrorMessage getErrorMessage(Integer i) {
 		return new ErrorMessage(i);

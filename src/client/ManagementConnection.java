@@ -20,8 +20,9 @@ public class ManagementConnection {
 		gamehost = host;
 		gameport = port;
 		socket = new Socket(gamehost, gameport);
-		inputStream = new ObjectInputStream(socket.getInputStream());
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
+		inputStream = new ObjectInputStream(socket.getInputStream());
+		
 	}
 	
 	public String getGamehost() {
@@ -38,6 +39,7 @@ public class ManagementConnection {
 		try {
 			o = inputStream.readObject();
 		} catch (ClassNotFoundException e) {
+			System.err.println("Wrong class in reply!");
 			return null;
 		}
 		if(o instanceof Message){

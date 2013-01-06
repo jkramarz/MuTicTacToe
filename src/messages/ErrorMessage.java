@@ -1,6 +1,10 @@
 package messages;
 
 class ErrorMessage extends Message {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3521258628682004272L;
 	int code;
 
 	public ErrorMessage(int i) {
