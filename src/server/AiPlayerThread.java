@@ -8,11 +8,11 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import messages.Message;
 
-class AIConnectionThread extends ConnectionThread {
+class AiPlayerThread extends PlayerThread {
 	Queue<Message> toClient;
 	Queue<Message> toServer;
 
-	AIConnectionThread(Marker marker) throws IOException {
+	AiPlayerThread(Marker marker) throws IOException {
 		this.toClient = new ConcurrentLinkedQueue<Message>();
 		this.toServer = new ConcurrentLinkedQueue<Message>();
 		this.marker = marker;

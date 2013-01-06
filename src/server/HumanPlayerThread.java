@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import messages.Message;
 
-class PlayerConnectionThread extends ConnectionThread {
+class HumanPlayerThread extends PlayerThread {
 
 	Queue<Message> toClient;
 	Queue<Message> toServer;
@@ -17,7 +17,7 @@ class PlayerConnectionThread extends ConnectionThread {
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
 
-	PlayerConnectionThread(Marker marker, Socket playerConnection) throws IOException {
+	HumanPlayerThread(Marker marker, Socket playerConnection) throws IOException {
 		this.playerConnection = playerConnection;
 		this.toClient = new ConcurrentLinkedQueue<Message>();
 		this.toServer = new ConcurrentLinkedQueue<Message>();

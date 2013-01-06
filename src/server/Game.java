@@ -21,7 +21,7 @@ public class Game extends Thread {
 	Queue toServer[] = new Queue[2];
 	@SuppressWarnings("rawtypes")
 	Queue toPlayer[] = new Queue[2];
-	ConnectionThread[] player = new ConnectionThread[2];
+	PlayerThread[] players = new PlayerThread[2];
 	private GameState gameState;
 
 	static enum GameState {
@@ -59,33 +59,39 @@ public class Game extends Thread {
 	void estabilishConnections() throws IOException {
 		for (int i = 0; i < 2; i++) {
 			if (i == 1 && gameType == "PVC") {
-				player[i] = new AIConnectionThread(i == 0 ? Marker.FIRST
+				players[i] = new AiPlayerThread(i == 0 ? Marker.FIRST
 						: Marker.SECOND);
 			} else {
-				player[i] = new PlayerConnectionThread(i == 0 ? Marker.FIRST
+				players[i] = new HumanPlayerThread(i == 0 ? Marker.FIRST
 						: Marker.SECOND, socket.accept());
 			}
-			toPlayer[i] = player[i].toClient();
-			toServer[i] = player[i].toServer();
-			player[i].start();
+			toPlayer[i] = players[i].toClient();
+			toServer[i] = players[i].toServer();
+			players[i].start();
 		}
-		player[0].setOpponent(player[1]);
-		player[1].setOpponent(player[0]);
+		
+		players[0].setOpponent(players[1]);
+		players[0].opponent().setOpponent(players[0]);
 	}
 
 	boolean playersConnected() {
-		return player[0].isAlive() && player[1].isAlive();
+		for(PlayerThread player: players){
+			if(!player.isAlive()){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	boolean chatAndDisconnect() {
-		for (int i = 0; i < 2; i++) {
-			if (!toServer[i].isEmpty()) {
-				if (toServer[i].peek() instanceof ChatMessage) {
-					player[i].opponent().toClient()
-							.add(player[i].toServer().poll());
-				} else if (toServer[i].peek() instanceof DisconnectMessage) {
-					player[i].opponent().toClient()
-							.add(player[i].toServer().poll());
+		for(PlayerThread player: players){
+			if (player.toServer().isEmpty()) {
+				if (player.toServer().peek() instanceof ChatMessage) {
+					player.opponent().toClient()
+							.add(player.toServer().poll());
+				} else if (player.toServer().peek() instanceof DisconnectMessage) {
+					player.opponent().toClient()
+							.add(player.toServer().poll());
 					return true;
 				}
 			}
@@ -102,13 +108,13 @@ public class Game extends Thread {
 			sides();
 			break;
 		case FIRST:
-			turn(player[0]);
+			turn(players[0]);
 			break;
 		case FIRSTWON:
 			winlose(0);
 			break;
 		case SECOND:
-			turn(player[0].opponent());
+			turn(players[0].opponent());
 			break;
 		case SECONDWON:
 			winlose(1);
@@ -122,32 +128,32 @@ public class Game extends Thread {
 	}
 
 	private void newgame() {
-		player[0].toClient().add(Message.getChooseSidesMessage());
+		players[0].toClient().add(Message.getChooseSidesMessage());
 		gameState = GameState.SIDES;
 	}
 
 	private void sides() {
-		if (!toServer[0].isEmpty()
-				&& toServer[0].peek() instanceof SidesMessage) {
-			SidesMessage m = (SidesMessage) toServer[0].poll();
+		if (!players[0].toServer().isEmpty()
+				&& players[0].toServer().peek() instanceof SidesMessage) {
+			SidesMessage m = (SidesMessage) players[0].toServer().poll();
 			if (m.getSide() == 0 || m.getSide() == 1) {
 				gameState = m.getSide() == 0 ? GameState.FIRST
 						: GameState.SECOND;
-				player[m.getSide()].toClient()
+				players[m.getSide()].toClient()
 						.add(Message.getYourTurnMessage());
 			}
-		} else if (!toServer[0].isEmpty()) {
-			player[0].toServer().remove();
-			player[0].toClient().add(Message.getErrorMessage(409));
+		} else if (!players[0].toServer().isEmpty()) {
+			players[0].toServer().remove();
+			players[0].toClient().add(Message.getErrorMessage(409));
 		}
 	}
 
 	private void winlose(int i) {
-		player[0].toClient().add(Message.getWinMessage());
-		player[0].opponent().toClient().add(Message.getLoseMessage());
+		players[0].toClient().add(Message.getWinMessage());
+		players[0].opponent().toClient().add(Message.getLoseMessage());
 	}
 
-	private void turn(ConnectionThread player) {
+	private void turn(PlayerThread player) {
 		if (player.toServer().isEmpty()
 				&& player.toServer().peek() instanceof PlaceMessage) {
 			PlaceMessage m = (PlaceMessage) player.toServer().poll();
@@ -219,8 +225,8 @@ public class Game extends Thread {
 	}
 
 	void disconnect() {
-		for (int i = 0; i < 2; i++) {
-			player[i].disconnect();
+		for (PlayerThread player: players){
+			player.disconnect();
 		}
 	}
 
