@@ -39,47 +39,18 @@ public class Server {
 		// try{
 		serversocket = new ServerSocket(port);
 		while (!interupted) {
-			try{
-			Socket socket = serversocket.accept();
-			Thread t = new Thread(new Connection(socket));
-			t.start();
-			}catch(Exception e){}
+			try {
+				Socket socket = serversocket.accept();
+				Thread t = new Thread(new Connection(socket));
+				t.start();
+			} catch (Exception e) {
+			}
 		}
 		serversocket.close();
 
 		/*
 		 * }catch(Exception e){ System.err.println("Whoops! ;-("); }
 		 */
-	}
-
-	static Message newGame(String name) {
-		System.err.println("Szukanie wolnego portu");
-		for (int i = port_start; i <= port_end; i++) {
-			System.err.println("Port " + i);
-			if (games.containsKey(i) && !games.get(i).isAlive()) {
-				System.err.println(" nieaktywana gra, zwalniam port");
-				games.remove(i);
-			}
-			if (!games.containsKey(i)) {
-				System.err.println(" wolny port, rozpoczynam grê");
-				Game game;
-				try {
-					if (name != null) {
-
-						game = new Game(i, name);
-					} else {
-						game = new Game(i);
-					}
-					games.put(i, game);
-					game.start();
-					return Message.getNewGameMessage(i);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		return Message.getErrorMessage(503);
 	}
 
 	static Message listGames() {
@@ -110,7 +81,31 @@ public class Server {
 	}
 
 	static Message newGame(NewGameRequestMessage m) {
-		// TODO Auto-generated method stub
-		return null;
+		return newGame(m.getType(), m.getName());
+	}
+
+	static Message newGame(String type, String name) {
+		System.err.println("Szukanie wolnego portu");
+		for (int i = port_start; i <= port_end; i++) {
+			System.err.println("Port " + i);
+			if (games.containsKey(i) && !games.get(i).isAlive()) {
+				System.err.println(" nieaktywana gra, zwalniam port");
+				games.remove(i);
+			}
+			if (!games.containsKey(i)) {
+				System.err.println(" wolny port, rozpoczynam grê");
+				Game game;
+				try {
+					game = new Game(i, type, name);
+					games.put(i, game);
+					game.start();
+					return Message.getNewGameMessage(i);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return Message.getErrorMessage(503);
 	}
 }

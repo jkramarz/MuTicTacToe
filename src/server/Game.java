@@ -16,6 +16,7 @@ public class Game extends Thread {
 	ServerSocket socket;
 	state turn = state.FIRST;
 	String gameName = null;
+	String gameType = null;
 	state[][] fields;
 
 	Queue<Message> toServer[];
@@ -34,12 +35,13 @@ public class Game extends Thread {
 	protected Game() {
 	}
 
-	public Game(int i, String n) throws IOException {
-		this(i);
-		gameName = n;
+	public Game(int i, String type, String name) throws IOException {
+		this(type, i);
+		gameName = name;
+		gameType = type;
 	}
 
-	public Game(int i) throws IOException {
+	public Game(String type, int i) throws IOException {
 		port = i;
 		socket = new ServerSocket(port);
 		fields = new state[10][10];
@@ -54,12 +56,22 @@ public class Game extends Thread {
 		return gameName;
 	}
 
+	public String getGameType() {
+		return gameType;
+	}
+
 	void estabilishConnections() throws IOException {
 		for (int i = 0; i < 2; i++) {
 			toPlayer[i] = new ConcurrentLinkedQueue<Message>();
 			toServer[i] = new ConcurrentLinkedQueue<Message>();
-			player[i] = new PlayerConnectionThread(socket.accept(),
-					toPlayer[i], toServer[i]);
+			if (i == 1 && gameType == "PVC") {
+				player[i] = new AIConnectionThread(
+						toPlayer[i], toServer[i]);
+			} else {
+				player[i] = new PlayerConnectionThread(socket.accept(),
+						toPlayer[i], toServer[i]);
+			}
+			player[i].start();
 		}
 	}
 
@@ -70,9 +82,9 @@ public class Game extends Thread {
 	boolean chatAndDisconnect() {
 		for (int i = 0; i < 2; i++) {
 			if (!toServer[i].isEmpty()) {
-				if(toServer[i].peek() instanceof ChatMessage){
+				if (toServer[i].peek() instanceof ChatMessage) {
 					toPlayer[opposite(i)].add(toServer[i].poll());
-				}else if(toServer[i].peek() instanceof DisconnectMessage){
+				} else if (toServer[i].peek() instanceof DisconnectMessage) {
 					toPlayer[opposite(i)].add(toServer[i].poll());
 					return true;
 				}
