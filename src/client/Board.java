@@ -26,8 +26,6 @@ import messages.Message;
 import messages.PlaceMessage;
 import messages.WinMessage;
 import messages.YourTurnMessage;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 public class Board extends JPanel {
 	/**
