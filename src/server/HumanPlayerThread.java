@@ -1,5 +1,6 @@
 package server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,21 +18,27 @@ class HumanPlayerThread extends PlayerThread {
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
 
-	HumanPlayerThread(Marker marker, Socket playerConnection) throws IOException {
+	HumanPlayerThread(Marker marker, Socket playerConnection) {
 		this.socket = playerConnection;
 		this.toClient = new ConcurrentLinkedQueue<Message>();
 		this.toServer = new ConcurrentLinkedQueue<Message>();
 		this.marker = marker;
-		inputStream = new ObjectInputStream(playerConnection.getInputStream());
-		outputStream = new ObjectOutputStream(
-				playerConnection.getOutputStream());
+		try {
+			inputStream = new ObjectInputStream(new BufferedInputStream(
+					playerConnection.getInputStream()));
+			outputStream = new ObjectOutputStream(
+					playerConnection.getOutputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
-	Queue<Message> toClient(){
+
+	Queue<Message> toClient() {
 		return toClient;
 	}
-	
-	Queue<Message> toServer(){
+
+	Queue<Message> toServer() {
 		return toServer;
 	}
 
