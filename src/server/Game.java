@@ -25,6 +25,8 @@ public class Game extends Thread {
 	PlayerThread[] players = new PlayerThread[2];
 	private GameState gameState;
 
+	int left;
+	
 	static enum GameState {
 		SIDES, FIRST, FIRSTWON, SECOND, SECONDWON, END, NEW
 	}
@@ -47,6 +49,7 @@ public class Game extends Thread {
 				board[x][y] = Marker.BLANK;
 			}
 		}
+		left = 100;
 	}
 
 	public String getGameName() {
@@ -152,8 +155,8 @@ public class Game extends Thread {
 	}
 
 	private void winlose(int i) {
-		players[0].toClient().add(Message.getWinMessage());
-		players[0].opponent().toClient().add(Message.getLoseMessage());
+		players[i].toClient().add(Message.getWinMessage());
+		players[i].opponent().toClient().add(Message.getLoseMessage());
 		gameState = GameState.END;
 	}
 
@@ -164,14 +167,19 @@ public class Game extends Thread {
 			if (board[m.getX()][m.getY()] == Marker.BLANK) {
 				board[m.getX()][m.getY()] = player.marker();
 				player.opponent().toClient().add(m);
+				left--;
 				if (checkWon(m.getX(), m.getY())) {
 					gameState = (gameState == GameState.FIRST ? GameState.FIRSTWON
 							: GameState.SECONDWON);
-				} else {
+				} else if(left > 0){
 					gameState = (gameState == GameState.FIRST ? GameState.SECOND
 							: GameState.FIRST);
 					player.opponent().toClient()
 							.add(Message.getYourTurnMessage());
+				}else{
+					players[0].toClient().add(Message.getLoseMessage());
+					players[0].opponent().toClient().add(Message.getLoseMessage());
+					gameState = GameState.END;
 				}
 			} else if (!toServer[0].isEmpty()) {
 				player.toClient().add(Message.getErrorMessage(403));

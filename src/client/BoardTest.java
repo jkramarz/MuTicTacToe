@@ -9,7 +9,7 @@ public class BoardTest {
 	@Test
 	public void testBoard() {
 		try {
-			Board board = new Board(null, null, 0);
+			Board board = new Board(null, null, 0, null);
 			assertTrue(board.img.length == board.nImages);
 			board = null;
 			fail();
@@ -21,7 +21,7 @@ public class BoardTest {
 	@Test
 	public void testNewGame() {
 		try {
-			Board board = new Board(null, null, 0);
+			Board board = new Board(null, null, 0, null);
 
 			board.newGame();
 			assertTrue(board.rows == 10);
@@ -37,7 +37,7 @@ public class BoardTest {
 	@Test
 	public void testPaintGraphics() {
 		try {
-			Board board = new Board(null, null, 0);
+			Board board = new Board(null, null, 0, null);
 			board.paint(null);
 			fail();
 		} catch (Exception e) {

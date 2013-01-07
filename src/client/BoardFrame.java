@@ -43,7 +43,8 @@ public class BoardFrame extends JFrame {
 	}
 
 	public void endOfGame() {
-		mainMenu.setVisible(true);
+		if(mainMenu != null)
+			mainMenu.setVisible(true);
 		dispose();
 	}
 

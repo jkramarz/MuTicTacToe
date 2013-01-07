@@ -8,13 +8,9 @@ public class GomokuTest {
 
 	//@Test
 	public void testGomoku() {
-		Client client = new Client("localhost", 10001);
-		assertNotNull("Gomoku can be created", client);
+		BoardFrame boardFrame = new BoardFrame("localhost", 10001, null);
+		assertNotNull("Gomoku can be created", boardFrame);
 	}
 
-	@Test
-	public void testMain() {
-		Client.main(null);
-	}
 
 }

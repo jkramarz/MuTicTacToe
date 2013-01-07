@@ -80,7 +80,7 @@ public class Board extends JPanel {
 				socket.getInputStream());
 		inputStream = new ObjectInputStream(bis);
 
-		JOptionPane.showMessageDialog(null, host + port);
+		//JOptionPane.showMessageDialog(null, host + port);
 
 		img = new Image[nImages];
 
