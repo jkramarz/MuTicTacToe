@@ -17,6 +17,7 @@ class HumanPlayerThread extends PlayerThread {
 	Socket socket;
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
+	private BufferedInputStream bis;
 
 	HumanPlayerThread(Marker marker, Socket playerConnection) {
 		this.socket = playerConnection;
@@ -24,8 +25,8 @@ class HumanPlayerThread extends PlayerThread {
 		this.toServer = new ConcurrentLinkedQueue<Message>();
 		this.marker = marker;
 		try {
-			inputStream = new ObjectInputStream(new BufferedInputStream(
-					playerConnection.getInputStream()));
+			bis = new BufferedInputStream(playerConnection.getInputStream());
+			inputStream = new ObjectInputStream(bis);
 			outputStream = new ObjectOutputStream(
 					playerConnection.getOutputStream());
 		} catch (IOException e) {
@@ -44,12 +45,12 @@ class HumanPlayerThread extends PlayerThread {
 
 	public void run() {
 		try {
-			while (socket.isConnected()) {
+			while (!socket.isClosed()) {
 				if (!toClient.isEmpty()) {
 					System.err.println("=>" + toClient.peek().toString());
 					outputStream.writeObject(toClient.poll());
 					outputStream.flush();
-				} else if (inputStream.available() > 0) {
+				} else if (bis.available()>0) {
 					Object o = inputStream.readObject();
 					System.err.println("<=" + o.toString());
 					if (o instanceof Message) {

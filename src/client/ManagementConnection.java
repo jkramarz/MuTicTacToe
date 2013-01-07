@@ -16,13 +16,15 @@ public class ManagementConnection {
 	private Socket socket;
 	private ObjectInputStream inputStream;
 	private ObjectOutputStream outputStream;
+	private BufferedInputStream bis;
 
 	ManagementConnection(String host, Integer port) throws IOException {
 		gamehost = host;
 		gameport = port;
 		socket = new Socket(gamehost, gameport);
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		inputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+		bis = new BufferedInputStream(socket.getInputStream());
+		inputStream = new ObjectInputStream(bis);
 		
 	}
 	

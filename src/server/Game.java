@@ -59,7 +59,7 @@ public class Game extends Thread {
 
 	void estabilishConnections() throws IOException {
 		for (int i = 0; i < 2; i++) {
-			if (i == 1 && gameType == "PVC") {
+			if (i == 1 && gameType.equals("PVC")) {
 				players[i] = new AiPlayerThread(i == 0 ? Marker.FIRST
 						: Marker.SECOND);
 			} else {
@@ -154,10 +154,11 @@ public class Game extends Thread {
 	private void winlose(int i) {
 		players[0].toClient().add(Message.getWinMessage());
 		players[0].opponent().toClient().add(Message.getLoseMessage());
+		gameState = GameState.END;
 	}
 
 	private void turn(PlayerThread player) {
-		if (player.toServer().isEmpty()
+		if (!player.toServer().isEmpty()
 				&& player.toServer().peek() instanceof PlaceMessage) {
 			PlaceMessage m = (PlaceMessage) player.toServer().poll();
 			if (fields[m.getX()][m.getY()] == Marker.BLANK) {
@@ -175,7 +176,7 @@ public class Game extends Thread {
 			} else if (!toServer[0].isEmpty()) {
 				player.toClient().add(Message.getErrorMessage(403));
 			}
-		} else {
+		} else if(!player.toServer().isEmpty()){
 			player.toServer().remove();
 			player.toClient().add(Message.getErrorMessage(409));
 		}

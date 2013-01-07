@@ -14,9 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import messages.ChatMessage;
 import messages.ChooseSidesMessage;
@@ -63,6 +65,8 @@ public class Board extends JPanel {
 	private ObjectInputStream inputStream;
 	private ObjectOutputStream outputStream;
 
+	private BufferedInputStream bis;
+
 	// ladujemy obrazki do tablicy
 	public Board(JLabel statusbar, String host, int port)
 			throws UnknownHostException, IOException {
@@ -70,17 +74,9 @@ public class Board extends JPanel {
 
 		socket = new Socket(host, port);
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		inputStream = new ObjectInputStream(new BufferedInputStream(
-				socket.getInputStream()));
-
-		try {
-			outputStream.writeObject(Message.getPingMessage());
-			outputStream.flush();
-			System.err.println(inputStream.readObject().toString());
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		bis = new BufferedInputStream(
+				socket.getInputStream());
+		inputStream = new ObjectInputStream(bis);
 
 		JOptionPane.showMessageDialog(null, host + port);
 
@@ -111,17 +107,27 @@ public class Board extends JPanel {
 		// pasek stanu
 		statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
 
-		class Worker extends Thread {
+		class Worker extends SwingWorker<Object, Object> {
 			@Override
-			public void run() {
+			protected Object doInBackground() throws Exception {
 				while (socket.isConnected()) {
 					try {
-						if (inputStream.available() > 0) {
+						if (bis.available() > 0) {
 							Object o = inputStream.readObject();
 							System.err.println("<=" + o.toString());
 							if (o instanceof Message) {
 								if (o instanceof YourTurnMessage) {
-									isMyTurn = true;
+									new SwingWorker<Object, Object>(){
+										@Override
+										protected Object doInBackground() {
+											isMyTurn = true;
+											statusbar.setText("Your Turn.");
+											repaint();
+											return null;
+										}
+										
+									}.execute();
+									
 								} else if (o instanceof ChooseSidesMessage) {
 									outputStream.writeObject(Message
 											.getSidesMessage(0));
@@ -132,9 +138,27 @@ public class Board extends JPanel {
 									field[getFieldId(m.getX(), m.getY())] = cHis;
 									repaint();
 								} else if (o instanceof WinMessage) {
-									// TODO
+									publish(new SwingWorker<Object, Object>(){
+										@Override
+										protected Object doInBackground() {
+											isMyTurn = false;
+											JOptionPane.showMessageDialog(new JFrame(), "You win!");
+											repaint();
+											return null;
+										}
+										
+									});
 								} else if (o instanceof LoseMessage) {
-									// TODO
+									publish(new SwingWorker<Object, Object>(){
+										@Override
+										protected Object doInBackground() {
+											isMyTurn = false;
+											JOptionPane.showMessageDialog(new JFrame(), "You lose!");
+											repaint();
+											return null;
+										}
+										
+									});
 								} else if (o instanceof DisconnectMessage) {
 									// TODO
 								} else {
@@ -150,13 +174,13 @@ public class Board extends JPanel {
 						e.printStackTrace();
 					}
 				}
-				return;
+				return null;
 			}
 
 		}
 
 		Worker worker = new Worker();
-		worker.start();
+		worker.execute();
 
 	}
 
@@ -188,9 +212,7 @@ public class Board extends JPanel {
 		public void mousePressed(MouseEvent e) {
 
 			// nie rob nic jezeli ruch nalezy do przeciwnika
-			/*
-			 * if (!isMyTurn) return;
-			 */
+			if (!isMyTurn) return;
 
 			// zamiana wspolrzednych na konkretne pole
 			int x = e.getX();
@@ -214,7 +236,7 @@ public class Board extends JPanel {
 						try {
 							Map<String, String> fieldId = getCoordsFromFieldId(field_id);
 							PlaceMessage m = Message.getPlaceMessage(
-									fieldId.get("x"), fieldId.get("y"));
+									fieldId.get("y"), fieldId.get("x"));
 							System.err.println("=>" + m.toString());
 							outputStream.writeObject(m);
 
@@ -222,9 +244,8 @@ public class Board extends JPanel {
 							left_cells--;
 							rep = true; // zmien flage - trzeba zaktualizowac
 										// plansze
-							isMyTurn = !isMyTurn;
-							statusbar.setText(isMyTurn ? "Your Turn."
-									: "Waiting for opponent...");
+							isMyTurn = false;
+							statusbar.setText("Waiting for opponent...");
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
