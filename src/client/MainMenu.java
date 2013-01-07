@@ -198,7 +198,7 @@ public class MainMenu extends JFrame {
 		try {
 			lastport = port = mc.createNewPvpGame();
 			this.setVisible(false);
-			new Client(host, port);
+			new BoardFrame(host, port, this);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -210,7 +210,7 @@ public class MainMenu extends JFrame {
 		try {
 			lastport = port = mc.createNewPvcGame();
 			this.setVisible(false);
-			new Client(host, port);
+			new BoardFrame(host, port, this);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,7 +219,7 @@ public class MainMenu extends JFrame {
 
 	private void joinMouseClicked(java.awt.event.MouseEvent evt) {
 		this.setVisible(false);
-		new Client(host, lastport);
+		new BoardFrame(host, lastport, this);
 	}
 
 	private void exitMouseClicked(java.awt.event.MouseEvent evt) {

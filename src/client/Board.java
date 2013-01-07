@@ -67,8 +67,10 @@ public class Board extends JPanel {
 
 	private BufferedInputStream bis;
 
+	private BoardFrame boardFrame;
+
 	// ladujemy obrazki do tablicy
-	public Board(JLabel statusbar, String host, int port)
+	public Board(JLabel statusbar, String host, int port, BoardFrame bf)
 			throws UnknownHostException, IOException {
 		this.statusbar = statusbar;
 
@@ -92,6 +94,8 @@ public class Board extends JPanel {
 		// podpinamy obserwatora i inicjujemy gre
 		addMouseListener(new BoardAdapter());
 		newGame();
+		
+		boardFrame = bf;
 	}
 
 	// inicjalizacja nowej gry
@@ -108,9 +112,11 @@ public class Board extends JPanel {
 		statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
 
 		class Worker extends SwingWorker<Object, Object> {
+			volatile boolean done = false;
+			
 			@Override
 			protected Object doInBackground() throws Exception {
-				while (socket.isConnected()) {
+				while (socket.isConnected() && done == false) {
 					try {
 						if (bis.available() > 0) {
 							Object o = inputStream.readObject();
@@ -138,27 +144,27 @@ public class Board extends JPanel {
 									field[getFieldId(m.getX(), m.getY())] = cHis;
 									repaint();
 								} else if (o instanceof WinMessage) {
-									publish(new SwingWorker<Object, Object>(){
+									new SwingWorker<Object, Object>(){
 										@Override
 										protected Object doInBackground() {
 											isMyTurn = false;
 											JOptionPane.showMessageDialog(new JFrame(), "You win!");
-											repaint();
+											disconnect();
 											return null;
 										}
 										
-									});
+									}.execute();
 								} else if (o instanceof LoseMessage) {
-									publish(new SwingWorker<Object, Object>(){
+									new SwingWorker<Object, Object>(){
 										@Override
 										protected Object doInBackground() {
 											isMyTurn = false;
 											JOptionPane.showMessageDialog(new JFrame(), "You lose!");
-											repaint();
+											disconnect();
 											return null;
 										}
 										
-									});
+									}.execute();
 								} else if (o instanceof DisconnectMessage) {
 									// TODO
 								} else {
@@ -174,7 +180,11 @@ public class Board extends JPanel {
 						e.printStackTrace();
 					}
 				}
+				endOfGame();
 				return null;
+			}
+			protected void disconnect() {
+				done = true;
 			}
 
 		}
@@ -182,6 +192,10 @@ public class Board extends JPanel {
 		Worker worker = new Worker();
 		worker.execute();
 
+	}
+
+	public void endOfGame() {
+		boardFrame.endOfGame();
 	}
 
 	// rysowanie planszy
