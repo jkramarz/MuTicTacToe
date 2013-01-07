@@ -16,7 +16,7 @@ public class Game extends Thread {
 	ServerSocket socket;
 	String gameName = null;
 	String gameType = null;
-	Marker[][] fields;
+	volatile Marker[][] board;
 
 	@SuppressWarnings("rawtypes")
 	Queue toServer[] = new Queue[2];
@@ -41,10 +41,10 @@ public class Game extends Thread {
 	public Game(String type, int i) throws IOException {
 		port = i;
 		socket = new ServerSocket(port);
-		fields = new Marker[10][10];
+		board = new Marker[10][10];
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10; y++) {
-				fields[x][y] = Marker.BLANK;
+				board[x][y] = Marker.BLANK;
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public class Game extends Thread {
 		for (int i = 0; i < 2; i++) {
 			if (i == 1 && gameType.equals("PVC")) {
 				players[i] = new AiPlayerThread(i == 0 ? Marker.FIRST
-						: Marker.SECOND);
+						: Marker.SECOND, board);
 			} else {
 				players[i] = new HumanPlayerThread(i == 0 ? Marker.FIRST
 						: Marker.SECOND, socket.accept());
@@ -161,8 +161,8 @@ public class Game extends Thread {
 		if (!player.toServer().isEmpty()
 				&& player.toServer().peek() instanceof PlaceMessage) {
 			PlaceMessage m = (PlaceMessage) player.toServer().poll();
-			if (fields[m.getX()][m.getY()] == Marker.BLANK) {
-				fields[m.getX()][m.getY()] = player.marker();
+			if (board[m.getX()][m.getY()] == Marker.BLANK) {
+				board[m.getX()][m.getY()] = player.marker();
 				player.opponent().toClient().add(m);
 				if (checkWon(m.getX(), m.getY())) {
 					gameState = (gameState == GameState.FIRST ? GameState.FIRSTWON
@@ -187,18 +187,18 @@ public class Game extends Thread {
 
 		// in column
 		count = 1;
-		for (int i = x + 1; i < 10 && fields[i][y] == fields[x][y]; i++, count++)
+		for (int i = x + 1; i < 10 && board[i][y] == board[x][y]; i++, count++)
 			;
-		for (int i = x - 1; i >= 0 && fields[i][y] == fields[x][y]; i--, count++)
+		for (int i = x - 1; i >= 0 && board[i][y] == board[x][y]; i--, count++)
 			;
 		if (count >= 5)
 			return true;
 
 		// in row
 		count = 1;
-		for (int i = y + 1; i < 10 && fields[x][i] == fields[x][y]; i++, count++)
+		for (int i = y + 1; i < 10 && board[x][i] == board[x][y]; i++, count++)
 			;
-		for (int i = y - 1; i >= 0 && fields[x][i] == fields[x][y]; i--, count++)
+		for (int i = y - 1; i >= 0 && board[x][i] == board[x][y]; i--, count++)
 			;
 		if (count >= 5)
 			return true;
@@ -206,10 +206,10 @@ public class Game extends Thread {
 		// in NE-SW
 		count = 1;
 		for (int i = 1; (x + i) < 10 && (y + i) < 10
-				&& fields[x + i][y + i] == fields[x][y]; i++, count++)
+				&& board[x + i][y + i] == board[x][y]; i++, count++)
 			;
 		for (int i = 1; (x - i) >= 0 && (y - i) >= 0
-				&& fields[x - i][y - i] == fields[x][y]; i++, count++)
+				&& board[x - i][y - i] == board[x][y]; i++, count++)
 			;
 		if (count >= 5)
 			return true;
@@ -217,10 +217,10 @@ public class Game extends Thread {
 		// in NW-SE
 		count = 1;
 		for (int i = 1; (x + i) < 10 && (y - i) >= 0
-				&& fields[x + i][y + i] == fields[x][y]; i++, count++)
+				&& board[x + i][y - i] == board[x][y]; i++, count++)
 			;
 		for (int i = 1; (x - i) >= 0 && (y + i) < 10
-				&& fields[x - i][y - i] == fields[x][y]; i++, count++)
+				&& board[x - i][y + i] == board[x][y]; i++, count++)
 			;
 		if (count >= 5)
 			return true;
