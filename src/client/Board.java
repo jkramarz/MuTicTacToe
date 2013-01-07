@@ -214,10 +214,10 @@ public class Board extends JPanel {
 		return (cRow * cols) + cCol;
 	}
 
-	Map<String, String> getCoordsFromFieldId(int id) {
-		Map<String, String> result = new HashMap<>();
-		result.put("x", new Integer(id % cols).toString());
-		result.put("y", new Integer(id / cols).toString());
+	Map<String, Integer> getCoordsFromFieldId(int id) {
+		Map<String, Integer> result = new HashMap<>();
+		result.put("x", new Integer(id % cols));
+		result.put("y", new Integer(id / cols));
 		return result;
 	}
 
@@ -248,7 +248,7 @@ public class Board extends JPanel {
 					// poloz pionek tylko gdy pole jest puste
 					if (field[field_id] == cBlank) {
 						try {
-							Map<String, String> fieldId = getCoordsFromFieldId(field_id);
+							Map<String, Integer> fieldId = getCoordsFromFieldId(field_id);
 							PlaceMessage m = Message.getPlaceMessage(
 									fieldId.get("y"), fieldId.get("x"));
 							System.err.println("=>" + m.toString());

@@ -50,8 +50,8 @@ public class Message implements Serializable{
 		return new NewGameRequestMessage(string);
 	}
 
-	public static PlaceMessage getPlaceMessage(String x, String y) {
-		return new PlaceMessage(new Integer(x), new Integer(y));
+	public static PlaceMessage getPlaceMessage(int x, int y) {
+		return new PlaceMessage(x, y);
 	}
 
 	public static SidesMessage getSidesMessage(int i) {
