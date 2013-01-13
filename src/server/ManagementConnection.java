@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import messages.ListGamesRequestMessage;
+import messages.GameListRequestMessage;
 import messages.Message;
 import messages.NewGameRequestMessage;
 import messages.PingMessage;
@@ -48,7 +48,7 @@ class ManagementConnection implements Runnable {
 		System.err.println(m.toString());
 		if (m instanceof NewGameRequestMessage) {
 			return Server.newGame((NewGameRequestMessage) m);
-		} else if (m instanceof ListGamesRequestMessage) {
+		} else if (m instanceof GameListRequestMessage) {
 			return Server.listGames();
 		} else if (m instanceof PingMessage) {
 			return Message.getPongMessage();

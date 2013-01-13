@@ -11,7 +11,6 @@ import java.util.Map;
 
 import messages.Message;
 import messages.NewGameRequestMessage;
-
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -54,17 +53,13 @@ public class Server {
 	}
 
 	static Message listGames() {
-		/*
-		 * ArrayList<Map<String, String>> gamesList = new ArrayList<>(); for(int
-		 * port : games.keySet()){ if(games.get(port) != null){ Map<String,
-		 * String> game = new HashMap<>(); game.put("port", new
-		 * Integer(port).toString()); game.put("name",
-		 * games.get(port).getGameName()); gamesList.add(game); } } Map<String,
-		 * Object> message = new HashMap<>(); message.add("status", "OK");
-		 * message.add("games", gamesList);
-		 */
-
-		return Message.getErrorMessage(401);
+		HashMap<Integer, String> list = new HashMap<>();	
+		 for(int port : games.keySet()){
+			 if(games.get(port) != null && games.get(port).isAlive()){
+				 list.put(port, String.valueOf(port));
+			 }
+		 }
+		return Message.getGameListMessage(list);
 	}
 
 	private static void setupSignalHandler() {
@@ -114,7 +109,6 @@ public class Server {
 					game.start();
 					return Message.getNewGameMessage(i);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
