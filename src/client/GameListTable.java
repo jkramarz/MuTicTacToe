@@ -60,8 +60,8 @@ public class GameListTable extends JPanel {
 		add(addDeletePanel);
 	}
 
-	static void createAndShowGUI(List<List<String>> list, MainMenuJFrame mainMenuJFrame) {
-		mm = mainMenuJFrame;
+	static void createAndShowGUI(List<List<String>> list, MainMenuJFrame mainMenu) {
+		mm = mainMenu;
 		JFrame frame = new JFrame("Lista gier");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setContentPane(new GameListTable(list));

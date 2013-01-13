@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,9 +26,11 @@ public class MainMenuJFrame extends JFrame {
 
 	// TODO
 	String host = "localhost";
-	private ManagementConnectionWrapper mc;
+	static MainMenuJFrame ref;
+	static ManagementConnectionWrapper mc;
 
 	public MainMenuJFrame() {
+		ref = this;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
@@ -53,21 +56,25 @@ public class MainMenuJFrame extends JFrame {
 			"Nowa gra PvC");
 	private javax.swing.JButton joinButton = new javax.swing.JButton(
 			"Do³¹cz do gry");
+	private javax.swing.JButton configureButton = new javax.swing.JButton(
+			"Konfiguracja");
 	private javax.swing.JButton exitButton = new javax.swing.JButton("Wyjœcie");
+
 	private javax.swing.JLabel jLabel1 = new javax.swing.JLabel("Gomoku");
 	private javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
 
 	void initComponents() throws InterruptedException {
 
 		try {
-			mc = new ManagementConnectionWrapper(host, 10001);
-			if(mc.sendCommand(Message.getPingMessage()) instanceof PongMessage){
-				//JOptionPane.showMessageDialog(null, "Connection successfull.");
-			}else{
+			mc = new ManagementConnectionWrapper(host);
+			if (mc.sendCommand(Message.getPingMessage()) instanceof PongMessage) {
+				// JOptionPane.showMessageDialog(null,
+				// "Connection successfull.");
+			} else {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Connection failed.");
+			JOptionPane.showMessageDialog(null, "B³¹d po³¹czenia.");
 		}
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -94,6 +101,13 @@ public class MainMenuJFrame extends JFrame {
 		joinButton.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 				joinMouseClicked(evt);
+			}
+		});
+
+		// button — konfiguracja
+		configureButton.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				configureMouseClicked(evt);
 			}
 		});
 
@@ -155,6 +169,11 @@ public class MainMenuJFrame extends JFrame {
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								Short.MAX_VALUE)
 																						.addComponent(
+																								configureButton,
+																								javax.swing.GroupLayout.DEFAULT_SIZE,
+																								javax.swing.GroupLayout.DEFAULT_SIZE,
+																								Short.MAX_VALUE)
+																						.addComponent(
 																								exitButton,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
@@ -170,6 +189,7 @@ public class MainMenuJFrame extends JFrame {
 						.addComponent(pvpButton).addGap(26, 26, 26)
 						.addComponent(pvcButton).addGap(26, 26, 26)
 						.addComponent(joinButton).addGap(26, 26, 26)
+						.addComponent(configureButton).addGap(26, 26, 26)
 						.addComponent(exitButton)
 						.addContainerGap(76, Short.MAX_VALUE)));
 
@@ -193,6 +213,15 @@ public class MainMenuJFrame extends JFrame {
 								Short.MAX_VALUE).addContainerGap()));
 
 		pack();
+	}
+
+	protected void configureMouseClicked(MouseEvent evt) {
+		new Thread(new Runnable() {
+			public void run() {
+				ConfigurationJFrame.createAndShowGUI();
+			}
+		}).start();
+
 	}
 
 	private void pvpButtonMouseClicked(java.awt.event.MouseEvent evt) {
@@ -222,12 +251,17 @@ public class MainMenuJFrame extends JFrame {
 	private void joinMouseClicked(java.awt.event.MouseEvent evt) {
 		this.setVisible(false);
 		try {
-			List<List<String>> list = mc.getGamesList();
-			GameListTable.createAndShowGUI(list, this);
+			final List<List<String>> list = mc.getGamesList();
+			new Thread(new Runnable() {
+				public void run() {
+					GameListTable.createAndShowGUI(list, MainMenuJFrame.ref);
+				}
+			}).start();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//new BoardFrame(host, lastport, this);
+		// new BoardFrame(host, lastport, this);
 	}
 
 	private void exitMouseClicked(java.awt.event.MouseEvent evt) {

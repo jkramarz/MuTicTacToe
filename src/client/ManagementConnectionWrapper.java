@@ -21,6 +21,9 @@ public class ManagementConnectionWrapper {
 	private ObjectOutputStream outputStream;
 	private BufferedInputStream bis;
 
+	ManagementConnectionWrapper(String host) throws IOException {
+		this(host, 10001);
+	}
 	ManagementConnectionWrapper(String host, Integer port) throws IOException {
 		gamehost = host;
 		gameport = port;
