@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class BoardFrame extends JFrame {
+public class BoardJFrame extends JFrame {
 
 	/**
 	 * 
@@ -17,10 +17,10 @@ public class BoardFrame extends JFrame {
 	private final int HEIGHT = 210;
 
 	private JLabel statusbar;
-	private MainMenu mainMenu;
+	private MainMenuJFrame mainMenuJFrame;
 
-	public BoardFrame(String host, int port, MainMenu m) {
-		mainMenu = m;
+	public BoardJFrame(String host, int port, MainMenuJFrame m) {
+		mainMenuJFrame = m;
 		try {
 			// parametry okna
 			// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,7 +31,7 @@ public class BoardFrame extends JFrame {
 			statusbar = new JLabel("");
 			add(statusbar, BorderLayout.SOUTH);
 			//nowa gra
-			add(new Board(statusbar, host, port, this));
+			add(new BoardJPanel(statusbar, host, port, this));
 			// wyswietlenie okna
 			setResizable(false);
 			setVisible(true);
@@ -43,8 +43,8 @@ public class BoardFrame extends JFrame {
 	}
 
 	public void endOfGame() {
-		if(mainMenu != null)
-			mainMenu.setVisible(true);
+		if(mainMenuJFrame != null)
+			mainMenuJFrame.setVisible(true);
 		dispose();
 	}
 

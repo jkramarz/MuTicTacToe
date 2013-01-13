@@ -2,7 +2,7 @@ package client;
 
 public class Client {
 	public static void main(String[] args) {
-		MainMenu m = new MainMenu();
+		MainMenuJFrame m = new MainMenuJFrame();
 		try {
 			m.initComponents();
 		} catch (InterruptedException e) {

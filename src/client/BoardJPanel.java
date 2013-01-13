@@ -29,7 +29,7 @@ import messages.PlaceMessage;
 import messages.WinMessage;
 import messages.YourTurnMessage;
 
-public class Board extends JPanel {
+public class BoardJPanel extends JPanel {
 	/**
 	 * 
 	 */
@@ -67,10 +67,10 @@ public class Board extends JPanel {
 
 	private BufferedInputStream bis;
 
-	private BoardFrame boardFrame;
+	private BoardJFrame boardJFrame;
 
 	// ladujemy obrazki do tablicy
-	public Board(JLabel statusbar, String host, int port, BoardFrame bf)
+	public BoardJPanel(JLabel statusbar, String host, int port, BoardJFrame bf)
 			throws UnknownHostException, IOException {
 		this.statusbar = statusbar;
 
@@ -95,7 +95,7 @@ public class Board extends JPanel {
 		addMouseListener(new BoardAdapter());
 		newGame();
 		
-		boardFrame = bf;
+		boardJFrame = bf;
 	}
 
 	// inicjalizacja nowej gry
@@ -195,7 +195,7 @@ public class Board extends JPanel {
 	}
 
 	public void endOfGame() {
-		boardFrame.endOfGame();
+		boardJFrame.endOfGame();
 	}
 
 	// rysowanie planszy

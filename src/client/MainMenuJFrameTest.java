@@ -6,11 +6,11 @@ import java.awt.Dimension;
 
 import org.junit.Test;
 
-public class MainMenuTest {
+public class MainMenuJFrameTest {
 
 	@Test
 	public void testMainMenu() {
-		MainMenu m = new MainMenu();
+		MainMenuJFrame m = new MainMenuJFrame();
 		Dimension d = m.getSize();
 		assertTrue("Is actual height declared height?", d.height == m.HEIGHT);
 		assertTrue("Is actual width declared width?", d.width == m.WIDTH);

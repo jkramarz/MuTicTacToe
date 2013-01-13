@@ -1,12 +1,15 @@
 package client;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import messages.Message;
 import messages.PongMessage;
 
-public class MainMenu extends JFrame {
+public class MainMenuJFrame extends JFrame {
 
 	/**
 	 * 
@@ -22,9 +25,9 @@ public class MainMenu extends JFrame {
 
 	// TODO
 	String host = "localhost";
-	private ManagementConnection mc;
+	private ManagementConnectionWrapper mc;
 
-	public MainMenu() {
+	public MainMenuJFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
@@ -53,12 +56,11 @@ public class MainMenu extends JFrame {
 	private javax.swing.JButton exitButton = new javax.swing.JButton("Wyjœcie");
 	private javax.swing.JLabel jLabel1 = new javax.swing.JLabel("Gomoku");
 	private javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
-	private int lastport = 10010;
 
 	void initComponents() throws InterruptedException {
 
 		try {
-			mc = new ManagementConnection(host, 10001);
+			mc = new ManagementConnectionWrapper(host, 10001);
 			if(mc.sendCommand(Message.getPingMessage()) instanceof PongMessage){
 				//JOptionPane.showMessageDialog(null, "Connection successfull.");
 			}else{
@@ -196,9 +198,9 @@ public class MainMenu extends JFrame {
 	private void pvpButtonMouseClicked(java.awt.event.MouseEvent evt) {
 		Integer port;
 		try {
-			lastport = port = mc.createNewPvpGame();
+			port = mc.createNewPvpGame();
 			this.setVisible(false);
-			new BoardFrame(host, port, this);
+			new BoardJFrame(host, port, this);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -208,9 +210,9 @@ public class MainMenu extends JFrame {
 	private void pvcMouseClicked(java.awt.event.MouseEvent evt) {
 		Integer port;
 		try {
-			lastport = port = mc.createNewPvcGame();
+			port = mc.createNewPvcGame();
 			this.setVisible(false);
-			new BoardFrame(host, port, this);
+			new BoardJFrame(host, port, this);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,7 +221,13 @@ public class MainMenu extends JFrame {
 
 	private void joinMouseClicked(java.awt.event.MouseEvent evt) {
 		this.setVisible(false);
-		new BoardFrame(host, lastport, this);
+		try {
+			List<List<String>> list = mc.getGamesList();
+			GameListTable.createAndShowGUI(list, this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//new BoardFrame(host, lastport, this);
 	}
 
 	private void exitMouseClicked(java.awt.event.MouseEvent evt) {

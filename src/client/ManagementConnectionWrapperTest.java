@@ -7,15 +7,15 @@ import java.net.ConnectException;
 
 import org.junit.Test;
 
-public class ManagementConnectionTest {
+public class ManagementConnectionWrapperTest {
 
 	@Test
 	public void testGameHostValue() throws IOException {
 		String expected_host = "localhost";
 		Integer expected_port = 6666;
-		ManagementConnection t = null;
+		ManagementConnectionWrapper t = null;
 		try {
-			t = new ManagementConnection(expected_host, expected_port);
+			t = new ManagementConnectionWrapper(expected_host, expected_port);
 		} catch (ConnectException e) {
 		}
 		if (t != null) {
