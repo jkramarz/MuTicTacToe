@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><testrun name="MuTicTacToe" project="MuTicTacToe" tests="30" started="30" failures="0" errors="0" ignored="0">
+  <testsuite name="messages.PlaceMessageTest" time="0.002">
+    <testcase name="testPlaceMessage" classname="messages.PlaceMessageTest" time="0.001"/>
+    <testcase name="testGetX" classname="messages.PlaceMessageTest" time="0.001"/>
+    <testcase name="testGetY" classname="messages.PlaceMessageTest" time="0.0"/>
+  </testsuite>
+  <testsuite name="messages.MessageTest" time="0.001">
+    <testcase name="testGetErrorMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetWinMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetPingMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetChooseSidesMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetLoseMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetNewGameMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetDisconnectMessage" classname="messages.MessageTest" time="0.0"/>
+    <testcase name="testGetPongMessage" classname="messages.MessageTest" time="0.001"/>
+    <testcase name="testGetYourTurnMessage" classname="messages.MessageTest" time="0.0"/>
+  </testsuite>
+  <testsuite name="messages.NewGameMessageTest" time="0.0">
+    <testcase name="testNewGameMessage" classname="messages.NewGameMessageTest" time="0.0"/>
+    <testcase name="testGetPort" classname="messages.NewGameMessageTest" time="0.0"/>
+  </testsuite>
+  <testsuite name="client.MainMenuTest" time="0.162">
+    <testcase name="testMainMenu" classname="client.MainMenuTest" time="0.162"/>
+  </testsuite>
+  <testsuite name="server.ServerTest" time="0.019">
+    <testcase name="testMain" classname="server.ServerTest" time="0.019"/>
+  </testsuite>
+  <testsuite name="client.ManagementConnectionTest" time="1.02">
+    <testcase name="testGameHostValue" classname="client.ManagementConnectionTest" time="1.02"/>
+  </testsuite>
+  <testsuite name="messages.ChatMessageTest" time="0.004">
+    <testcase name="testGetChat" classname="messages.ChatMessageTest" time="0.004"/>
+  </testsuite>
+  <testsuite name="messages.NewGameRequestMessageTest" time="0.002">
+    <testcase name="testNewGameRequestMessageString" classname="messages.NewGameRequestMessageTest" time="0.001"/>
+    <testcase name="testNewGameRequestMessage" classname="messages.NewGameRequestMessageTest" time="0.001"/>
+  </testsuite>
+  <testsuite name="client.BoardTest" time="0.012">
+    <testcase name="testPaintGraphics" classname="client.BoardTest" time="0.008"/>
+    <testcase name="testBoard" classname="client.BoardTest" time="0.002"/>
+    <testcase name="testNewGame" classname="client.BoardTest" time="0.002"/>
+  </testsuite>
+  <testsuite name="messages.SidesMessageTest" time="0.001">
+    <testcase name="testSidesMessage" classname="messages.SidesMessageTest" time="0.0"/>
+    <testcase name="testGetSide" classname="messages.SidesMessageTest" time="0.001"/>
+  </testsuite>
+  <testsuite name="messages.ErrorMessageTest" time="0.002">
+    <testcase name="testGetErrorCode" classname="messages.ErrorMessageTest" time="0.001"/>
+    <testcase name="testGetErrorText" classname="messages.ErrorMessageTest" time="0.001"/>
+  </testsuite>
+  <testsuite name="server.GameTest" time="0.017">
+    <testcase name="testGameIntString" classname="server.GameTest" time="0.014"/>
+    <testcase name="testGetGameName" classname="server.GameTest" time="0.001"/>
+    <testcase name="testGameInt" classname="server.GameTest" time="0.002"/>
+  </testsuite>
+</testrun>
