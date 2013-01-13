@@ -11,4 +11,8 @@ public class GameListMessage extends Message {
 	}
 	
 	HashMap<Integer,String> list;
+	
+	public HashMap<Integer,String> getList(){
+		return list;
+	}
 }
