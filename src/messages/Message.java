@@ -1,6 +1,7 @@
 package messages;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class Message implements Serializable{
 	/**
@@ -56,5 +57,13 @@ public class Message implements Serializable{
 
 	public static SidesMessage getSidesMessage(int i) {
 		return new SidesMessage(i);
+	}
+	
+	public static GameListMessage getGameListMessage(HashMap<Integer,String> list){
+		return new GameListMessage(list);
+	}
+	
+	public static GameListRequestMessage getGameListRequestMessage(){
+		return new GameListRequestMessage();
 	}
 }
