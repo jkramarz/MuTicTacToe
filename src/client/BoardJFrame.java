@@ -29,7 +29,7 @@ public class BoardJFrame extends JFrame {
 			setTitle("5-in-a-row");
 			// pasek stanu
 			statusbar = new JLabel("");
-			add(statusbar, BorderLayout.SOUTH);
+			add(statusbar, BorderLayout.NORTH);
 			//nowa gra
 			add(new BoardJPanel(statusbar, host, port, this));
 			// wyswietlenie okna

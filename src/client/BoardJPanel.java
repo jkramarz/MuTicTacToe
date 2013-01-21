@@ -109,6 +109,7 @@ public class BoardJPanel extends JPanel {
 			field[i] = cBlank;
 
 		// pasek stanu
+		statusbar.setVisible(true);
 		statusbar.setText(isMyTurn ? "Your Turn." : "Waiting for opponent...");
 
 		class Worker extends SwingWorker<Object, Object> {
