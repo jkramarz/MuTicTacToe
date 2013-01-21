@@ -21,7 +21,7 @@ public class MainMenuJFrame extends JFrame {
 	final static int network = 1;
 
 	// wymiary okienka
-	int WIDTH = 170;
+	int WIDTH = 100;
 	int HEIGHT = 210;
 
 	// TODO
